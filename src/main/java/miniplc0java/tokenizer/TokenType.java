@@ -148,7 +148,9 @@ public enum TokenType {
     /**
      * 分号
      */
-    SEMICOLON;
+    SEMICOLON,
+    /*** 文件结尾 */
+    EOF;
 
     @Override
     public String toString() {
@@ -222,7 +224,9 @@ public enum TokenType {
             case DOUBLE_LITERAL:
                 return "Double";
             case STRING_LITEREAL:
-                return "Sr";
+                return "String";
+            case EOF:
+                return "EndOfFile";
             default:
                 return "InvalidToken";
         }
