@@ -25,7 +25,7 @@ public class Tokenizer {
         skipSpaceCharacters();
 
         if (it.isEOF()) {
-            return new Token(TokenType.EOF, "", it.currentPos(), it.currentPos());
+//            return new Token(TokenType.EOF, "", it.currentPos(), it.currentPos());
         }
 
         char peek = it.peekChar();
@@ -66,7 +66,7 @@ public class Tokenizer {
     private Token lexOperatorOrUnknown() throws TokenizeError {
         switch (it.nextChar()) {
             case '+':
-                return new Token(TokenType.Plus, '+', it.previousPos(), it.currentPos());
+//                return new Token(TokenType.Plus, '+', it.previousPos(), it.currentPos());
 
             case '-':
                 // 填入返回语句
