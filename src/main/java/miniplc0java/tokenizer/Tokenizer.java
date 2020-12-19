@@ -5,6 +5,8 @@ import miniplc0java.error.ErrorCode;
 
 import miniplc0java.util.Pos;
 
+import java.nio.CharBuffer;
+
 public class Tokenizer {
 
     private StringIter it;
@@ -32,13 +34,83 @@ public class Tokenizer {
         }
 
         char peek = it.peekChar();
-        if (Character.isDigit(peek)) {
+        if (Character.isDigit(peek))
             return lexUInt();
-        } else if (Character.isAlphabetic(peek)) {
+        else if (Character.isAlphabetic(peek) || peek == '_')
             return lexIdentOrKeyword();
-        } else {
+        else if (peek == '"')
+            return lexString();
+        else if (peek == '\'')
+            return lexChar();
+        else
             return lexOperatorOrUnknown();
+    }
+
+    private Token lexString() throws TokenizeError {
+        // 跳过双引号"
+        Pos prePos = it.currentPos();
+        it.nextChar();
+        StringBuilder ret = new StringBuilder("");
+        int flag = 0; // 用于判别转义
+        while (!it.isEOF() && it.peekChar() != '"') {
+            if (flag == 1)
+                if (isEscapeSequence(it.peekChar()))
+                    flag = 0;
+                else
+                    break;
+            else if (it.peekChar() == '\\')
+                flag = 1;
+            ret.append(it.peekChar());
+            it.nextChar();
         }
+        // 退出时代表正常结束或者识别错误
+        // 正常结束时下一位应为"
+        // 否则是提前出现"或者\单独出现，错误
+        if (it.peekChar() == '"') {
+            it.nextChar();
+            return new Token(TokenType.STRING_LITEREAL, ret, prePos, it.currentPos());
+        }
+        throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
+    }
+
+    private Token lexChar() throws TokenizeError {
+        Pos prePos = it.currentPos();
+        it.nextChar();
+        char ret;
+        if (it.peekChar() == '\\') {
+            it.nextChar();
+            switch (it.peekChar()) {
+                case '\\':
+                    ret = '\\';
+                    break;
+                case 'r':
+                    ret = '\r';
+                    break;
+                case 'n':
+                    ret = '\n';
+                    break;
+                case 't':
+                    ret = '\t';
+                    break;
+                case '"':
+                    ret = '"';
+                    break;
+                case '\'':
+                    ret = '\'';
+                    break;
+                default:
+                    throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
+            }
+        } else if (it.peekChar() == '\'')
+            throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
+        else
+            ret = it.peekChar();
+        it.nextChar();
+        return new Token(TokenType.STRING_LITEREAL, ret, prePos, it.currentPos());
+    }
+
+    private boolean isEscapeSequence(char c) {
+        return c == '\\' || c == 'r' || c == 'n' || c == 't' || c == '"' || c == '\'';
     }
 
     private Token lexUInt() throws TokenizeError {
@@ -51,12 +123,20 @@ public class Tokenizer {
         //
         // Token 的 Value 应填写数字的值
         Pos prePos = it.currentPos();
-        int ret = 0;
+        StringBuilder ret = new StringBuilder("");
+        ret.append(lexDigit());
+        if (it.peekChar() == '.')
+            ret.append(lexDigit());
+        return new Token(TokenType.Uint_LITERAL, ret, prePos, it.currentPos());
+    }
+
+    private String lexDigit() throws TokenizeError {
+        StringBuilder ret = new StringBuilder("");
         while (!it.isEOF() && Character.isDigit(it.peekChar())) {
-            ret = ret * 10 + (it.peekChar() - '0');
+            ret.append(it.peekChar());
             it.nextChar();
         }
-        return new Token(TokenType.Uint_LITERAL, ret, prePos, it.currentPos());
+        return ret.toString();
     }
 
     private Token lexIdentOrKeyword() throws TokenizeError {
@@ -72,11 +152,11 @@ public class Tokenizer {
         Pos prePos = it.currentPos();
         StringBuilder ret = new StringBuilder("");
         TokenType type;
-        while (!it.isEOF() && (Character.isAlphabetic(it.peekChar()) || Character.isDigit(it.peekChar()))) {
+        while (!it.isEOF() && (Character.isAlphabetic(it.peekChar()) || Character.isDigit(it.peekChar()) || it.peekChar() == '_')) {
             ret.append(it.peekChar());
             it.nextChar();
         }
-        
+
         switch (ret.toString()) {
             case "fn":
                 type = TokenType.FN_KW;
