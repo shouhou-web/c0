@@ -35,7 +35,7 @@ public class Tokenizer {
 
         char peek = it.peekChar();
         if (Character.isDigit(peek))
-            return lexUInt();
+            return lexUIntOrDouble();
         else if (Character.isAlphabetic(peek) || peek == '_')
             return lexIdentOrKeyword();
         else if (peek == '"')
@@ -113,7 +113,7 @@ public class Tokenizer {
         return c == '\\' || c == 'r' || c == 'n' || c == 't' || c == '"' || c == '\'';
     }
 
-    private Token lexUInt() throws TokenizeError {
+    private Token lexUIntOrDouble() throws TokenizeError {
         // 请填空：
         // 直到查看下一个字符不是数字为止:
         // -- 前进一个字符，并存储这个字符
@@ -125,17 +125,34 @@ public class Tokenizer {
         Pos prePos = it.currentPos();
         StringBuilder ret = new StringBuilder("");
         ret.append(lexDigit());
-        if (it.peekChar() == '.')
+        if (it.peekChar() == '.') {
+            ret.append(it.peekChar());
+            it.nextChar();
             ret.append(lexDigit());
-        return new Token(TokenType.Uint_LITERAL, ret, prePos, it.currentPos());
+            if (it.peekChar() == 'e' || it.peekChar() == 'E') {
+                ret.append(it.peekChar());
+                it.nextChar();
+                if (it.peekChar() == '+' || it.peekChar() == '-') {
+                    ret.append(it.peekChar());
+                    it.nextChar();
+                }
+                ret.append(lexDigit());
+            }
+            return new Token(TokenType.DOUBLE_LITERAL, Double.parseDouble(ret.toString()), prePos, it.currentPos());
+        }
+        return new Token(TokenType.Uint_LITERAL, Integer.parseInt(ret.toString()), prePos, it.currentPos());
     }
 
     private String lexDigit() throws TokenizeError {
         StringBuilder ret = new StringBuilder("");
+        boolean flag = true; // 用于记录是否进入循环
         while (!it.isEOF() && Character.isDigit(it.peekChar())) {
+            flag = false;
             ret.append(it.peekChar());
             it.nextChar();
         }
+        if (flag)
+            throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
         return ret.toString();
     }
 
