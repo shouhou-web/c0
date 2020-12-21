@@ -157,24 +157,20 @@ public class Analyser {
         }
     }
 
-//    /**
-//     * 如果下一个 检查TY的，暂时没想好
-//     *
-//     * @param tt 类型
-//     * @return 这个 token
-//     * @throws CompileError 如果类型不匹配
-//     */
-//    private Token expectTY() throws CompileError {
-//        var token = peek();
-//        switch (token.getTokenType()) {
-//
-//        }
-//        if (token.getTokenType() == tt) {
-//            return next();
-//        } else {
-//            throw new ExpectedTokenError(TokenType.KW, token);
-//        }
-//    }
+    /**
+     * 如果下一个 检查TY的，暂时没想好
+     *
+     * @return 这个 token
+     * @throws CompileError 如果类型不匹配
+     */
+    private Token expectTY() throws CompileError {
+        var token = peek();
+        if (check(TokenType.INT_KW) || check(TokenType.VOID_KW) || check(TokenType.DOUBLE_KW)) {
+            return next();
+        } else {
+            throw new ExpectedTokenError(TokenType.TY_KW, token);
+        }
+    }
 
     /**
      * 获取下一个变量的栈偏移
@@ -221,7 +217,7 @@ public class Analyser {
         expect(TokenType.ARROW);
 
         // 类型
-        var typeToken = expect(TokenType.IDENT);
+        var typeToken = expectTY();
         String type = typeToken.getValueString();
 
         // block_stmt
@@ -250,7 +246,7 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expect(TokenType.IDENT);
+        var typeToken = expectTY();
         String type = typeToken.getValueString();
 
         // 似乎还应该做些什么
@@ -348,7 +344,7 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expect(TokenType.IDENT);
+        var typeToken = expectTY();
         String type = typeToken.getValueString();
 
         // ('=' expr)?
@@ -374,7 +370,7 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expect(TokenType.IDENT);
+        var typeToken = expectTY();
         String type = typeToken.getValueString();
 
         // ('=' expr)?

@@ -64,7 +64,22 @@ public enum TokenType {
      * continue
      */
     CONTINUE_KW,
-
+    /**
+     * ty
+     */
+    TY_KW,
+    /**
+     * int
+     */
+    INT_KW,
+    /**
+     * void
+     */
+    VOID_KW,
+    /**
+     * double
+     */
+    DOUBLE_KW,
     /**---- 标识符 ------ */
     /**
      * 标识符
@@ -177,6 +192,14 @@ public enum TokenType {
                 return "break";
             case CONTINUE_KW:
                 return "continue";
+            case TY_KW:
+                return "Type";
+            case INT_KW:
+                return "int";
+            case VOID_KW:
+                return "void";
+            case DOUBLE_KW:
+                return "double";
             case PLUS:
                 return "PlusSign";
             case MINUS:

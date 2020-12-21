@@ -205,6 +205,15 @@ public class Tokenizer {
             case "continue":
                 type = TokenType.CONTINUE_KW;
                 break;
+            case "int":
+                type = TokenType.INT_KW;
+                break;
+            case "double":
+                type = TokenType.DOUBLE_KW;
+                break;
+            case "void":
+                type = TokenType.VOID_KW;
+                break;
             default:
                 type = TokenType.IDENT;
                 break;
