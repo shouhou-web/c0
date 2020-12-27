@@ -158,7 +158,7 @@ public class Analyser {
     }
 
     /**
-     * 如果下一个 检查TY的，暂时没想好
+     * 检查函数返回值TY的
      *
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
@@ -166,6 +166,21 @@ public class Analyser {
     private Token expectTY() throws CompileError {
         var token = peek();
         if (check(TokenType.INT_KW) || check(TokenType.VOID_KW) || check(TokenType.DOUBLE_KW)) {
+            return next();
+        } else {
+            throw new ExpectedTokenError(TokenType.TY_KW, token);
+        }
+    }
+
+    /**
+     * 检查变量定义TY的，暂时没想好
+     *
+     * @return 这个 token
+     * @throws CompileError 如果类型不匹配
+     */
+    private Token expectParam_TY() throws CompileError {
+        var token = peek();
+        if (check(TokenType.INT_KW) || check(TokenType.DOUBLE_KW)) {
             return next();
         } else {
             throw new ExpectedTokenError(TokenType.TY_KW, token);
@@ -201,7 +216,7 @@ public class Analyser {
         // function -> 'fn' IDENT '(' function_param_list? ')' '->' ty block_stmt
         expect(TokenType.FN_KW);
 
-        // 加入符号表（不确定，待修改）
+        // todo:加入符号表（不确定，待修改）
         var nameToken = expect(TokenType.IDENT);
         String name = nameToken.getValueString();
         addSymbol(name, false, false, true, nameToken.getStartPos());
@@ -246,10 +261,10 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expectTY();
+        var typeToken = expectParam_TY();
         String type = typeToken.getValueString();
 
-        // 似乎还应该做些什么
+        // todo:似乎还应该做些什么
 
     }
 
@@ -344,14 +359,14 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expectTY();
+        var typeToken = expectParam_TY();
         String type = typeToken.getValueString();
 
         // ('=' expr)?
-        if (nextIf(TokenType.ASSIGN)!=null)
+        if (nextIf(TokenType.ASSIGN) != null)
             analyseExpr();
 
-        // 很明显，这里差东西
+        // todo:很明显，这里差东西
 
         // ;
         expect(TokenType.SEMICOLON);
@@ -370,14 +385,14 @@ public class Analyser {
         expect(TokenType.COLON);
 
         // 类型
-        var typeToken = expectTY();
+        var typeToken = expectParam_TY();
         String type = typeToken.getValueString();
 
-        // ('=' expr)?
-        if (nextIf(TokenType.ASSIGN)!=null)
-            analyseExpr();
+        // '=' expr
+        expect(TokenType.ASSIGN);
+        analyseExpr();
 
-        // 很明显，这里差东西
+        // todo:很明显，这里差东西
 
         // ;
         expect(TokenType.SEMICOLON);
@@ -388,26 +403,26 @@ public class Analyser {
         // { if }
         expect(TokenType.IF_KW);
 
-        // 这里的表达式要干啥呢？？
+        // todo:这里的表达式要干啥呢？？
         analyseExpr();
 
-        // 是否应该在进入前保存一些状态
+        // todo:是否应该在进入前保存一些状态
         analyseBlock_Stmt();
 
         // ('else' 'if' expr block_stmt)*
         while (nextIf(TokenType.ELSE_KW) != null) {
             expect(TokenType.IF_KW);
 
-            // 这里的表达式要干啥呢？？
+            // todo:这里的表达式要干啥呢？？
             analyseExpr();
 
-            // 是否应该在进入前保存一些状态
+            // todo:是否应该在进入前保存一些状态
             analyseBlock_Stmt();
         }
 
         // ('else' block_stmt)?
         if (nextIf(TokenType.ELSE_KW) != null) {
-            // 是否应该在进入前保存一些状态
+            // todo:是否应该在进入前保存一些状态
             analyseBlock_Stmt();
         }
     }
@@ -417,10 +432,10 @@ public class Analyser {
         //  { while }
         expect(TokenType.WHILE_KW);
 
-        // 这里的表达式要干啥呢？？
+        // todo:这里的表达式要干啥呢？？
         analyseExpr();
 
-        // 是否应该在进入前保存一些状态
+        // todo:是否应该在进入前保存一些状态
         analyseBlock_Stmt();
     }
 
@@ -453,22 +468,122 @@ public class Analyser {
 
     private void analyseExpr() throws CompileError {
         // # 表达式
-        // expr -> operator_expr
-        //       | negate_expr
-        //       | assign_expr
-        //       | as_expr
-        //       | call_expr
-        //       | literal_expr
-        //       | ident_expr
-        //       | group_ex
+        // expr -> exprA
+        analyseExprA();
     }
 
-    private void analyseOperator_expr() throws CompileError {
-        // operator_expr -> expr binary_operator expr
+    private void analyseExprA() throws CompileError {
+        // A -> B ( '=' A )*
+        analyseExprB();
+        // 避免连等
+        if (nextIf(TokenType.ASSIGN) != null)
+            analyseExprA();
     }
 
-    private void analyseNegate_expr() throws CompileError {
-        // negate_expr -> '-' expr
-        // { - }
+    private void analyseExprB() throws CompileError {
+        // B -> C ( ( '<'|'>'|'<='|'>='|'=='|'!=' ) C )*
+        analyseExprC();
+        while (check(TokenType.LT) || check(TokenType.GT) || check(TokenType.LE) || check(TokenType.GE) || check(TokenType.EQ) || check(TokenType.NEQ)) {
+            var token = next();
+            switch (token.getTokenType()) {
+                case LT:
+                case GT:
+                case LE:
+                case GE:
+                case EQ:
+                case NEQ:
+                    // todo:这里应该做些啥
+                    analyseExprC();
+                default:
+                    throw new ExpectedTokenError(TokenType.LT, peekedToken);
+            }
+        }
+    }
+
+    private void analyseExprC() throws CompileError {
+        // C -> D ( {+|-} D )*
+        analyseExprD();
+        while (check(TokenType.PLUS) || check(TokenType.MINUS)) {
+            var token = next();
+            switch (token.getTokenType()) {
+                case PLUS:
+                case MINUS:
+                    // todo:这里应该做些啥
+                    analyseExprD();
+                default:
+                    throw new ExpectedTokenError(TokenType.PLUS, token);
+            }
+        }
+    }
+
+    private void analyseExprD() throws CompileError {
+        // D -> E ( {*|/} E )*
+        analyseExprE();
+        while (check(TokenType.MUL) || check(TokenType.DIV)) {
+            var token = next();
+            switch (token.getTokenType()) {
+                case MUL:
+                case DIV:
+                    // todo:这里应该做些啥
+                    analyseExprE();
+                default:
+                    throw new ExpectedTokenError(TokenType.MUL, token);
+            }
+        }
+
+    }
+
+    private void analyseExprE() throws CompileError {
+        // E -> F [ 'as' type ]
+        analyseExprF();
+        if (nextIf(TokenType.AS_KW) != null) {
+            var typeToken = expectParam_TY();
+            String type = typeToken.getValueString();
+        }
+    }
+
+    private void analyseExprF() throws CompileError {
+        // F -> [ '-' ] G
+        if (nextIf(TokenType.MINUS) != null) {
+            // todo:F表达式的负号分析
+        }
+        analyseExprG();
+    }
+
+    private void analyseExprG() throws CompileError {
+        // G -> '(' A ')' | H
+        if (nextIf(TokenType.L_PAREN) != null) {
+            analyseExprA();
+            expect(TokenType.R_PAREN);
+        }
+        analyseExprH();
+    }
+
+    private void analyseExprH() throws CompileError {
+        // H -> I | Ident [ '(' A (',' A)* ')' ]
+        if (check(TokenType.IDENT)) {
+            var nameToken = expect(TokenType.IDENT);
+            String name = nameToken.getValueString();
+
+            // 这里是函数调用
+            if (nextIf(TokenType.L_PAREN) != null) {
+                analyseExprA();
+                while (nextIf(TokenType.COMMA) != null) {
+                    analyseExprA();
+                }
+                expect(TokenType.R_PAREN);
+                return;
+            }
+
+            // todo:这里是普通ident，应该检查符号表?
+        }
+        analyseExprI();
+    }
+
+    private void analyseExprI() throws CompileError {
+        // I -> UINT_LITERAL | DOUBLE_LITERAL | STRING_LITERAL | CHAR_LITERAL
+        if (check(TokenType.Uint_LITERAL) || check(TokenType.DOUBLE_LITERAL) || check(TokenType.STRING_LITEREAL) || check(TokenType.CHAR_LITEREAL))
+            return;
+        throw new ExpectedTokenError(TokenType.MUL, peekedToken);
     }
 }
