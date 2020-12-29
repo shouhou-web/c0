@@ -1,9 +1,13 @@
 package miniplc0java.analyser;
 
+import java.util.LinkedHashMap;
+
 public class SymbolEntry {
     boolean isConstant;
     boolean isInitialized;
     boolean isFunction; // 是否是函数名
+    String type; // int string
+    int order; // 在全局或函数中的顺序
     int stackOffset;
 
     /**

@@ -33,7 +33,7 @@ public class Analyser {
     /**
      * 符号表
      */
-    LinkedHashMap<String, SymbolEntry> symbolTable = new LinkedHashMap<>();
+    SymbolTable currentTable = new SymbolTable();
 
     /**
      * 下一个变量的栈偏移
