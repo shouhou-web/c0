@@ -80,6 +80,18 @@ public enum TokenType {
      * double
      */
     DOUBLE_KW,
+    /**
+     * string
+     */
+    STRING_KW,
+    /**
+     * char
+     */
+    CHAR_KW,
+    /**
+     * boolead
+     */
+    BOOLEAN_KW,
     /**---- 标识符 ------ */
     /**
      * 标识符

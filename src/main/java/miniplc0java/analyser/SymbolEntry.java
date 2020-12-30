@@ -1,12 +1,15 @@
 package miniplc0java.analyser;
 
+import miniplc0java.tokenizer.TokenType;
+
 import java.util.LinkedHashMap;
 
 public class SymbolEntry {
     boolean isConstant;
     boolean isInitialized;
-    boolean isFunction; // 是否是函数名
-    String type; // int string
+    boolean isTemporary;
+    SymbolType symbolType;
+    TokenType type; // int string
     int order; // 在全局或函数中的顺序
     int stackOffset;
 
@@ -15,11 +18,28 @@ public class SymbolEntry {
      * @param isDeclared
      * @param stackOffset
      */
-    public SymbolEntry(boolean isConstant, boolean isDeclared, boolean isFunction, int stackOffset) {
+    public SymbolEntry(boolean isConstant, boolean isDeclared, TokenType type, SymbolType symbolType, int stackOffset) {
         this.isConstant = isConstant;
         this.isInitialized = isDeclared;
-        this.isFunction = isFunction;
+        this.type = type;
+        this.symbolType = symbolType;
         this.stackOffset = stackOffset;
+    }
+
+    // 两种临时变量储存方式
+    public SymbolEntry(boolean isInitialized, TokenType type) {
+        // 初始化的，包括int,string,double
+        this.isInitialized = isInitialized;
+        this.type = type;
+        this.symbolType = SymbolType.TEMPORARY;
+    }
+
+    // 两种临时变量储存方式
+    public SymbolEntry(TokenType type) {
+        // 未初始化的，包括void,boolean
+        this.isInitialized = false;
+        this.type = type;
+        this.symbolType = SymbolType.TEMPORARY;
     }
 
     /**
