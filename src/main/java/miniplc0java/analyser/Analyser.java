@@ -31,7 +31,7 @@ public class Analyser {
     Token peekedToken = null;
 
     /**
-     * 符号表
+     * 当前的符号表
      */
     SymbolTable currentTable = new SymbolTable();
 
@@ -41,14 +41,9 @@ public class Analyser {
     LinkedHashMap<String, Function> funcTable = new LinkedHashMap<>();
 
     /**
-     * 全局函数
+     * 当前分析的函数
      */
     Function curFunc;
-
-    /**
-     * 当前expr计算出来的值类型
-     */
-    TokenType curExprType;
 
     /**
      * 下一个变量的栈偏移
@@ -98,22 +93,14 @@ public class Analyser {
             throw new AnalyzeError(ErrorCode.DuplicateFunction, curPos);
         else {
             var func = new Function(name);
+            // 将函数名加入变量表
+            currentTable.putVariable(name, new SymbolEntry(false, false, TokenType.FUNCTION_KW, SymbolType.Function, getNextVariableOffset()));
             // 设置当前分析的函数
             curFunc = func;
+            // 设置其在全局变量表中的位置
+            curFunc.order = currentTable.get(name).order;
             funcTable.put(name, func);
         }
-    }
-
-    /**
-     * 设置符号为已赋值
-     *
-     * @param name   符号名称
-     * @param curPos 当前位置（报错用）
-     * @throws AnalyzeError 如果未定义则抛异常
-     */
-    private void initializeSymbol(String name, Pos curPos) throws CompileError {
-        var entry = currentTable.get(name);
-        entry.setInitialized(true);
     }
 
     /**
@@ -190,7 +177,7 @@ public class Analyser {
     }
 
     /**
-     * 检查函数返回值TY的
+     * 检查函数返回值TY的，如果是则前进一位
      *
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
@@ -205,7 +192,7 @@ public class Analyser {
     }
 
     /**
-     * 检查变量定义TY的，暂时没想好
+     * 检查变量定义TY的，如果是则前进一位
      *
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
@@ -226,6 +213,15 @@ public class Analyser {
      */
     private void newDomain() {
         currentTable = new SymbolTable(currentTable);
+    }
+
+    /**
+     * 退出域进入原本域
+     *
+     * @param
+     */
+    private void exitDomain() {
+        currentTable = currentTable.fatherTable;
     }
 
     /**
@@ -281,12 +277,18 @@ public class Analyser {
         // block_stmt
         analyseBlock_Stmt();
 
+        // 退出域
+        exitDomain();
     }
 
     private void analyseFunctionParamList() throws CompileError {
         // function_param_list -> function_param (',' function_param)*
 
-        while (check(TokenType.IDENT) || check(TokenType.CONST_KW))
+        if (check(TokenType.IDENT) || check(TokenType.CONST_KW))
+            analyseFunctionParam();
+
+        // 检查多个参数
+        while (nextIf(TokenType.COMMA) != null)
             analyseFunctionParam();
     }
 
@@ -330,9 +332,9 @@ public class Analyser {
         switch (peekedToken.getTokenType()) {
             case L_BRACE:
                 // block_stmt
-                // todo:作用域嵌套
                 newDomain();
                 analyseBlock_Stmt();
+                exitDomain();
                 break;
             case SEMICOLON:
                 // empty_stmt
@@ -374,6 +376,7 @@ public class Analyser {
         expect(TokenType.L_BRACE);
 
         // 分析语句
+        // todo:这个循环似乎有错？
         while (!check(TokenType.R_BRACE))
             analyseStmt();
 
@@ -413,20 +416,11 @@ public class Analyser {
         // ('=' expr)?
         boolean isInitialized = false;
         if (nextIf(TokenType.ASSIGN) != null) {
+            // 分析表达式
             if (analyseExpr().type == typeToken)
                 isInitialized = true;
             else
-                throw new CompileError() {
-                    @Override
-                    public ErrorCode getErr() {
-                        return ErrorCode.InvalidAssignment;
-                    }
-
-                    @Override
-                    public Pos getPos() {
-                        return null;
-                    }
-                };
+                throwError(ErrorCode.InvalidAssignment);
         }
 
         // 加入符号表
@@ -453,18 +447,10 @@ public class Analyser {
 
         // '=' expr
         expect(TokenType.ASSIGN);
-        if (analyseExpr().type != typeToken)
-            throw new CompileError() {
-                @Override
-                public ErrorCode getErr() {
-                    return ErrorCode.InvalidAssignment;
-                }
 
-                @Override
-                public Pos getPos() {
-                    return null;
-                }
-            };
+        // 分析表达式
+        if (analyseExpr().type != typeToken)
+            throwError(ErrorCode.InvalidAssignment);
 
         // 加入符号表
         addSymbolVariable(name, true, true, typeToken, nameToken.getStartPos());
@@ -484,7 +470,10 @@ public class Analyser {
 
         // 进入前进入新的域
         newDomain();
+        // 块分析
         analyseBlock_Stmt();
+        // 退出域
+        exitDomain();
 
         // ('else' 'if' expr block_stmt)*
         while (nextIf(TokenType.ELSE_KW) != null) {
@@ -495,14 +484,20 @@ public class Analyser {
 
             // 进入前进入新的域
             newDomain();
+            // 块分析
             analyseBlock_Stmt();
+            // 退出域
+            exitDomain();
         }
 
         // ('else' block_stmt)?
         if (nextIf(TokenType.ELSE_KW) != null) {
             // 进入前进入新的域
             newDomain();
+            // 块分析
             analyseBlock_Stmt();
+            // 退出域
+            exitDomain();
         }
     }
 
@@ -516,7 +511,10 @@ public class Analyser {
 
         // 进入前进入新的域
         newDomain();
+        // 块分析
         analyseBlock_Stmt();
+        // 退出域
+        exitDomain();
     }
 
     private void analyseBreak_Stmt() throws CompileError {
@@ -538,21 +536,11 @@ public class Analyser {
         // { return }
         expect(TokenType.RETURN_KW);
 
-        // expr
-        analyseExpr();
-        if (curExprType != curFunc.ret_type) {
-            throw new CompileError() {
-                @Override
-                public ErrorCode getErr() {
-                    return ErrorCode.OtherReturnType;
-                }
+        // 检查返回值类型
+        var expr = analyseExpr();
+        if (expr.type != curFunc.ret_type)
+            throwError(ErrorCode.OtherReturnType);
 
-                @Override
-                public Pos getPos() {
-                    return null;
-                }
-            };
-        }
         expect(TokenType.SEMICOLON);
     }
 
@@ -570,19 +558,21 @@ public class Analyser {
 
     private SymbolEntry analyseExprA() throws CompileError {
         // A -> B ( '=' A )*
-        var expr = analyseExprB();
+        var exprA = analyseExprB();
         // 避免连等
         if (nextIf(TokenType.ASSIGN) != null) {
-            checkIfNotTemp(expr);
-            checkIdentType(expr, analyseExprA());
+            checkIfNotTemp(exprA);
+            checkIdentInitialized(analyseExprA());
+            // 赋值变量
+            exprA.setInitialized(true);
             return new SymbolEntry(TokenType.VOID_KW);
         }
-        return expr;
+        return exprA;
     }
 
     private SymbolEntry analyseExprB() throws CompileError {
         // B -> C ( ( '<'|'>'|'<='|'>='|'=='|'!=' ) C )*
-        var expr = analyseExprC();
+        var exprB = analyseExprC();
         if (check(TokenType.LT) || check(TokenType.GT) || check(TokenType.LE) || check(TokenType.GE) || check(TokenType.EQ) || check(TokenType.NEQ)) {
             var token = next();
             switch (token.getTokenType()) {
@@ -592,64 +582,65 @@ public class Analyser {
                 case GE:
                 case EQ:
                 case NEQ:
-                    checkIdentType(analyseExprC(), expr);
+                    checkIdentType(analyseExprC(), exprB);
                     return new SymbolEntry(TokenType.BOOLEAN_KW);
                 default:
                     // 这个语句应该不会被执行到
                     throw new ExpectedTokenError(TokenType.LT, peekedToken);
             }
         }
-        return expr;
+        return exprB;
     }
 
     private SymbolEntry analyseExprC() throws CompileError {
         // C -> D ( {+|-} D )*
-        var expr = analyseExprD();
+        var exprC = analyseExprD();
         if (check(TokenType.PLUS) || check(TokenType.MINUS)) {
             var token = next();
             switch (token.getTokenType()) {
                 case PLUS:
                 case MINUS:
                     // 检查类型和初始化,并返回相应type的临时变量
-                    checkIdentType(analyseExprD(), expr);
-                    return new SymbolEntry(true, expr.type);
+                    checkIdentType(analyseExprD(), exprC);
+                    exprC = new SymbolEntry(true, exprC.type);
+                    break;
                 default:
                     throw new ExpectedTokenError(TokenType.PLUS, token);
             }
         }
-        return expr;
+        return exprC;
     }
 
     private SymbolEntry analyseExprD() throws CompileError {
         // D -> E ( {*|/} E )*
-        var expr = analyseExprE();
+        var exprD = analyseExprE();
         while (check(TokenType.MUL) || check(TokenType.DIV)) {
             var token = next();
             switch (token.getTokenType()) {
                 case MUL:
                 case DIV:
                     // 检查类型和初始化,并返回相应type的临时变量
-                    checkIdentType(analyseExprE(), expr);
-                    return new SymbolEntry(true, expr.type);
+                    checkIdentType(analyseExprE(), exprD);
+                    exprD = new SymbolEntry(true, exprD.type);
+                    break;
                 default:
                     throw new ExpectedTokenError(TokenType.MUL, token);
             }
         }
-        return expr;
+        return exprD;
     }
 
     private SymbolEntry analyseExprE() throws CompileError {
         // E -> F [ 'as' type ]
-        var expr = analyseExprF();
+        var exprE = analyseExprF();
         if (nextIf(TokenType.AS_KW) != null) {
             var typeToken = expectParam_TY();
-            if (expr.isInitialized && (expr.type == TokenType.INT_KW || expr.type == TokenType.DOUBLE_KW)) {
-                return new SymbolEntry(true,typeToken);
-            }
+            if (exprE.isInitialized && (exprE.type == TokenType.INT_KW || exprE.type == TokenType.DOUBLE_KW))
+                return new SymbolEntry(true, typeToken);
             else
                 throwError(ErrorCode.InvalidAs);
         }
-        return expr;
+        return exprE;
     }
 
     private SymbolEntry analyseExprF() throws CompileError {
@@ -695,10 +686,10 @@ public class Analyser {
                 if (func.ret_type == TokenType.VOID_KW)
                     return new SymbolEntry(TokenType.VOID_KW);
                 else
-                    return new SymbolEntry(func.ret_type);
+                    return new SymbolEntry(true, func.ret_type);
             }
 
-            // 获取ident
+            // 获取Ident
             return currentTable.get(name);
         }
         return analyseExprI();
@@ -728,18 +719,27 @@ public class Analyser {
     }
 
     /**
-     * 检查类型和初始化
+     * 检查比较两边的类型
      *
      * @param exprA
      * @param exprB
      */
     private void checkIdentType(SymbolEntry exprA, SymbolEntry exprB) throws CompileError {
-        if (!exprA.isInitialized || !exprB.isInitialized) {
-            throwError(ErrorCode.NotInitialized);
-        }
+        checkIdentInitialized(exprA);
+        checkIdentInitialized(exprB);
         if (exprA.type != exprB.type) {
             throwError(ErrorCode.InvalidCalculation);
         }
+    }
+
+    /**
+     * 检查变量初始化
+     *
+     * @param expr
+     */
+    private void checkIdentInitialized(SymbolEntry expr) throws CompileError {
+        if (!expr.isInitialized)
+            throwError(ErrorCode.NotInitialized);
     }
 
     private void throwError(ErrorCode error) throws CompileError {

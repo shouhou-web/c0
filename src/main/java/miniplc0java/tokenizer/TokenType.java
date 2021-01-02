@@ -89,9 +89,13 @@ public enum TokenType {
      */
     CHAR_KW,
     /**
-     * boolead
+     * boolean
      */
     BOOLEAN_KW,
+    /**
+     * function
+     */
+    FUNCTION_KW,
     /**---- 标识符 ------ */
     /**
      * 标识符

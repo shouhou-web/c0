@@ -26,7 +26,7 @@ public class SymbolEntry {
         this.stackOffset = stackOffset;
     }
 
-    // 两种临时变量储存方式
+    // 第一种种临时变量储存方式
     public SymbolEntry(boolean isInitialized, TokenType type) {
         // 初始化的，包括int,string,double
         this.isInitialized = isInitialized;
@@ -34,7 +34,7 @@ public class SymbolEntry {
         this.symbolType = SymbolType.TEMPORARY;
     }
 
-    // 两种临时变量储存方式
+    // 第二种临时变量储存方式
     public SymbolEntry(TokenType type) {
         // 未初始化的，包括void,boolean
         this.isInitialized = false;

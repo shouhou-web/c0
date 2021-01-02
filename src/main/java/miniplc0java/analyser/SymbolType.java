@@ -4,5 +4,6 @@ public enum SymbolType {
     ALL,
     VARIABLE,
     PARAM,
-    TEMPORARY
+    TEMPORARY,
+    Function
 }

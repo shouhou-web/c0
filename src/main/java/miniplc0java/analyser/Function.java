@@ -4,6 +4,8 @@ import miniplc0java.tokenizer.TokenType;
 
 public class Function {
     String name;
+    // 在全局变量表中占得位置
+    int order;
     // 返回值占的节点数
     int ret_slots = 0;
     // 返回值类型
@@ -18,10 +20,10 @@ public class Function {
     // body.items
 
     /**
-     * @param Name 函数名
+     * @param name 函数名
      */
-    public Function(String Name) {
-        name = Name;
+    public Function(String name) {
+        this.name = name;
     }
 
     /**
@@ -46,9 +48,16 @@ public class Function {
     }
 
     /**
-     * @param locSlots 局部变量个数
+     * @param
      */
-    public void setLoc_slots(int locSlots) {
-        loc_slots = locSlots;
+    public void incLoc_slots() {
+        loc_slots += 1;
+    }
+
+    /**
+     * @param order 函数在全局变量表中的位置
+     */
+    public void setOrder(int order) {
+        this.order = order;
     }
 }
