@@ -1,6 +1,9 @@
 package miniplc0java.analyser;
 
+import miniplc0java.instruction.Instruction;
 import miniplc0java.tokenizer.TokenType;
+
+import java.util.ArrayList;
 
 public class Function {
     String name;
@@ -17,7 +20,7 @@ public class Function {
     // 指令数目
     int body_count;
     // 指令集合
-    // body.items
+    ArrayList<Instruction> body;
 
     /**
      * @param name 函数名

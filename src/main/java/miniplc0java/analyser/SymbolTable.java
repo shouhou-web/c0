@@ -37,10 +37,11 @@ public class SymbolTable {
     }
 
     // 添加变量
-    public void putVariable(String name, SymbolEntry entry) throws CompileError {
+    public SymbolEntry putVariable(String name, SymbolEntry entry) throws CompileError {
         checkDuplicateDeclaration(name);
         entry.order = ++variableOrder;
         symbolTable.put(name, entry);
+        return entry;
     }
 
     private void checkDuplicateDeclaration(String name) throws CompileError {

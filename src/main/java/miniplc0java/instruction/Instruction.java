@@ -4,21 +4,31 @@ import java.util.Objects;
 
 public class Instruction {
     private Operation opt;
-    Integer x;
+    int type; // 0无参数，1代表u32的参数，2代表u64的参数
+    Object x;
 
     public Instruction(Operation opt) {
         this.opt = opt;
-        this.x = 0;
+        this.type = 0;
+        this.x = null;
     }
 
     public Instruction(Operation opt, Integer x) {
         this.opt = opt;
+        this.type = 1;
         this.x = x;
     }
 
-    public Instruction() {
-        this.opt = Operation.LIT;
-        this.x = 0;
+    public Instruction(Operation opt, Long x) {
+        this.opt = opt;
+        this.type = 2;
+        this.x = x;
+    }
+
+    public Instruction(Operation opt, Double x) {
+        this.opt = opt;
+        this.type = 2;
+        this.x = x;
     }
 
     @Override
@@ -44,7 +54,7 @@ public class Instruction {
         this.opt = opt;
     }
 
-    public Integer getX() {
+    public Object getX() {
         return x;
     }
 
@@ -55,17 +65,6 @@ public class Instruction {
     @Override
     public String toString() {
         switch (this.opt) {
-            case ADD:
-            case DIV:
-            case ILL:
-            case MUL:
-            case SUB:
-            case WRT:
-                return String.format("%s", this.opt);
-            case LIT:
-            case LOD:
-            case STO:
-                return String.format("%s %s", this.opt, this.x);
             default:
                 return "ILL";
         }

@@ -16,14 +16,12 @@ public class SymbolEntry {
     /**
      * @param isConstant
      * @param isDeclared
-     * @param stackOffset
      */
-    public SymbolEntry(boolean isConstant, boolean isDeclared, TokenType type, SymbolType symbolType, int stackOffset) {
+    public SymbolEntry(boolean isConstant, boolean isDeclared, TokenType type, SymbolType symbolType) {
         this.isConstant = isConstant;
         this.isInitialized = isDeclared;
         this.type = type;
         this.symbolType = symbolType;
-        this.stackOffset = stackOffset;
     }
 
     // 第一种种临时变量储存方式
