@@ -4,10 +4,10 @@ import miniplc0java.tokenizer.TokenType;
 
 import java.util.LinkedHashMap;
 
+
 public class SymbolEntry {
     boolean isConstant;
     boolean isInitialized;
-    boolean isTemporary;
     SymbolType symbolType;
     TokenType type; // int string
     int order; // 在全局或函数中的顺序
@@ -38,6 +38,23 @@ public class SymbolEntry {
         this.isInitialized = false;
         this.type = type;
         this.symbolType = SymbolType.TEMPORARY;
+    }
+
+    public String toVmCode() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (isConstant)
+            stringBuilder.append("00000001");
+        else
+            stringBuilder.append("00000000");
+        stringBuilder.append("00000000" +
+                "00000000" +
+                "00000000" +
+                "00000000" +
+                "00000000" +
+                "00000000" +
+                "00000000" +
+                "00000000");
+        return stringBuilder.toString();
     }
 
     /**

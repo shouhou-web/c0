@@ -51,6 +51,8 @@ public class Function {
     }
 
     /**
+     * 增加局部变量数
+     *
      * @param
      */
     public void incLoc_slots() {
@@ -58,9 +60,41 @@ public class Function {
     }
 
     /**
+     * 增加指令数
+     *
+     * @param
+     */
+    public void incBody_count() {
+        body_count += 1;
+    }
+
+    /**
      * @param order 函数在全局变量表中的位置
      */
     public void setOrder(int order) {
         this.order = order;
+    }
+
+
+    public String toVmCode() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(toFullBinaryString(order));
+        stringBuilder.append(toFullBinaryString(ret_slots));
+        stringBuilder.append(toFullBinaryString(param_slots));
+        stringBuilder.append(toFullBinaryString(loc_slots));
+        stringBuilder.append(toFullBinaryString(body_count));
+        for (Instruction instruction : body
+        ) {
+            stringBuilder.append(instruction.toVmCode());
+        }
+        return stringBuilder.toString();
+    }
+
+    //将整数num转化为32位的二进制数
+    public static String toFullBinaryString(int num) {
+        char[] chs = new char[Integer.SIZE];
+        for (int i = 0; i < Integer.SIZE; i++)
+            chs[Integer.SIZE - 1 - i] = (char) (((num >> i) & 1) + '0');
+        return new String(chs);
     }
 }

@@ -88,7 +88,7 @@ public class Analyser {
             // 设置当前分析的函数
             curFunc = func;
             // 设置其在全局变量表中的位置
-            curFunc.order = currentTable.get(name).order;
+            curFunc.setOrder(currentTable.get(name).order);
             funcTable.put(name, func);
         }
     }
@@ -222,7 +222,9 @@ public class Analyser {
      */
     public Instruction addInstruction(Operation opt, Integer x) {
         Instruction instruction = new Instruction(opt, x);
-        this.curFunc.body.add(instruction);
+        curFunc.body.add(instruction);
+        // 增加指令数
+        curFunc.incBody_count();
         return instruction;
     }
 
@@ -422,6 +424,9 @@ public class Analyser {
             analyseLet_Decl_Stmt();
         else if (check(TokenType.CONST_KW))
             analyseConst_Decl_Stmt();
+
+        // 增加局部变量数
+        curFunc.incLoc_slots();
     }
 
     private void analyseLet_Decl_Stmt() throws CompileError {

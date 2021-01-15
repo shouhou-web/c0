@@ -41,6 +41,31 @@ public class Instruction {
         return opt == that.opt && Objects.equals(x, that.x);
     }
 
+    public String toVmCode() {
+        StringBuilder stringBuilder = new StringBuilder();
+        // 加入指令编号
+        stringBuilder.append(toFullBinaryString(opt.getOptnum(), 8));
+        // 有参数的加入占位
+        if (type == 1 || type == 2)
+            stringBuilder.append("00000000" +
+                    "00000000" +
+                    "00000000" +
+                    "00000000" +
+                    "00000000" +
+                    "00000000" +
+                    "00000000" +
+                    "00000000");
+        return stringBuilder.toString();
+    }
+
+    public static String toFullBinaryString(int num, int size) {
+        char[] chs = new char[size];
+        for (int i = 0; i < size; i++)
+            chs[size - 1 - i] = (char) (((num >> i) & 1) + '0');
+
+        return new String(chs);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(opt, x);
