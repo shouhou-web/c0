@@ -45,18 +45,15 @@ public class App {
             }
         }
 
-        OutputStream output;
-        if (outputFileName.equals("-")) {
-            output = System.out;
-        } else {
-            try {
-                output = new FileOutputStream(outputFileName);
-            } catch (FileNotFoundException e) {
-                System.err.println("Cannot open output file.");
-                e.printStackTrace();
-                System.exit(2);
-                return;
-            }
+        FileOutputStream output;
+        try {
+            // output = new PrintStream(new FileOutputStream(outputFileName));
+            output = new FileOutputStream(outputFileName);
+        } catch (FileNotFoundException e) {
+            System.err.println("Cannot open output file.");
+            e.printStackTrace();
+            System.exit(2);
+            return;
         }
 
         Scanner scanner;
@@ -68,10 +65,8 @@ public class App {
         analyzer.analyse();
         OutPutBinary answer = new OutPutBinary(analyzer.currentTable, analyzer.funcTable);
         List<Byte> bytes = answer.generate();
-        for (int i = 0; i < bytes.size(); i++) {
-            Byte b = bytes.get(i);
+        for (Byte b : bytes)
             output.write(b);
-        }
     }
 
     private static ArgumentParser buildArgparse() {

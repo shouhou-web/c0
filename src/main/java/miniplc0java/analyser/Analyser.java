@@ -89,7 +89,7 @@ public class Analyser {
         else {
             var func = new Function(name);
             // 将函数名加入变量表
-            currentTable.putVariable(name, new SymbolEntry(false, false, TokenType.FUNCTION_KW, SymbolType.Function));
+            currentTable.putGlobalVariable(new SymbolEntry(false, false, TokenType.FUNCTION_KW, SymbolType.Function, name));
             // 设置当前分析的函数
             curFunc = func;
             // 设置其在全局变量表中的位置
@@ -895,7 +895,7 @@ public class Analyser {
             return new SymbolEntry(true, TokenType.DOUBLE_KW);
         } else if (tt == TokenType.STRING_LITEREAL) {
             // String
-            System.out.println("233:"+nameToken.getValue().toString());
+            System.out.println("233:" + nameToken.getValue().toString());
             SymbolEntry entry = addGlobalSymbolVariable(nameToken.getValue().toString());
             addInstruction(Operation.push, entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);

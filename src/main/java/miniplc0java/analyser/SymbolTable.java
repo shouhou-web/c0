@@ -55,7 +55,7 @@ public class SymbolTable {
             find = find.fatherTable;
         }
         entry.order = ++find.variableOrder;
-        find.putVariable("string" + entry.order, entry);
+        find.putVariable(entry.getValue(), entry);
         return entry;
     }
 
@@ -80,6 +80,7 @@ public class SymbolTable {
         while (find.symbolTable.get(name) == null && find.fatherTable != null) {
             find = find.fatherTable;
         }
+        System.out.println(name);
         if (find.symbolTable.get(name) == null)
             throw new CompileError() {
                 @Override

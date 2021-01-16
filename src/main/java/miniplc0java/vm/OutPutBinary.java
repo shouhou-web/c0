@@ -8,9 +8,7 @@ import miniplc0java.analyser.SymbolType;
 import miniplc0java.instruction.Instruction;
 import miniplc0java.instruction.Operation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 public class OutPutBinary {
     SymbolTable symbolTable;
@@ -41,8 +39,9 @@ public class OutPutBinary {
         List<Byte> globalCount = int2bytes(4, globals.size());
         output.addAll(globalCount);
 
-        for (int i = 0; i < globals.size(); i++) {
-            SymbolEntry oneGlobalSymbol = globals.get(i);
+        for (Map.Entry<String, SymbolEntry> stringSymbolEntryEntry : globals.entrySet()) {
+            var entry = (Map.Entry) stringSymbolEntryEntry;
+            SymbolEntry oneGlobalSymbol = (SymbolEntry) entry.getValue();
             List<Byte> globalIsConst;
             if (oneGlobalSymbol.isConstant())
                 globalIsConst = int2bytes(1, 1);
@@ -58,15 +57,33 @@ public class OutPutBinary {
 
             output.addAll(globalValue);
         }
+//
+//        for (int i = 0; i < globals.size(); i++) {
+//            SymbolEntry oneGlobalSymbol = globals.get(i);
+//            List<Byte> globalIsConst;
+//            if (oneGlobalSymbol.isConstant())
+//                globalIsConst = int2bytes(1, 1);
+//            else
+//                globalIsConst = int2bytes(1, 0);
+//
+//            output.addAll(globalIsConst);
+//
+//            List<Byte> globalValue = getValueByte(oneGlobalSymbol);
+//
+//            List<Byte> globalValueCount = int2bytes(4, globalValue.size());
+//            output.addAll(globalValueCount);
+//
+//            output.addAll(globalValue);
+//        }
 
         // 函数列表
 
         List<Byte> functions_count = int2bytes(4, functionTables.size());
         output.addAll(functions_count);
 
-        for (int i = 0; i < functionTables.size(); i++) {
-            Function oneFunction = functionTables.get(i);
-
+        for (Map.Entry<String, Function> stringSymbolEntryEntry : functionTables.entrySet()) {
+            var entry = (Map.Entry) stringSymbolEntryEntry;
+            Function oneFunction = (Function) entry.getValue();
             // 函数名
             List<Byte> name = int2bytes(4, oneFunction.getOrder());
             output.addAll(name);
@@ -104,6 +121,47 @@ public class OutPutBinary {
                 }
             }
         }
+//
+//        for (int i = 0; i < functionTables.size(); i++) {
+//            Function oneFunction = functionTables.get(i);
+//
+//            // 函数名
+//            List<Byte> name = int2bytes(4, oneFunction.getOrder());
+//            output.addAll(name);
+//
+//            // 返回值
+//            List<Byte> retSlots = int2bytes(4, oneFunction.getRet_slots());
+//            output.addAll(retSlots);
+//
+//            // 参数
+//            List<Byte> paramsSlots = int2bytes(4, oneFunction.getParam_slots());
+//            output.addAll(paramsSlots);
+//
+//            // 局部变量
+//            List<Byte> locSlots = int2bytes(4, oneFunction.getLoc_slots());
+//            output.addAll(locSlots);
+//
+//            // 函数体指令
+//            ArrayList<Instruction> instructions = oneFunction.getBody();
+//            List<Byte> bodyCount = int2bytes(4, instructions.size());
+//            output.addAll(bodyCount);
+//
+//            // 指令集
+//            for (Instruction instruction : instructions) {
+//                // type
+//                Operation opt = instruction.getOpt();
+//                List<Byte> type = int2bytes(1, opt.getOptnum());
+//                output.addAll(type);
+//
+//                if (instruction.getType() > 0) {
+//                    List<Byte> x;
+//                    if (instruction.getType() == 2)
+//                        x = long2bytes(8, 0);
+//                    else x = long2bytes(4, 0);
+//                    output.addAll(x);
+//                }
+//            }
+//        }
         return output;
     }
 
