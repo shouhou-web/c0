@@ -120,12 +120,12 @@ public class Analyser {
     private Token next() throws TokenizeError {
         if (peekedToken != null) {
             var token = peekedToken;
-//            System.out.println("下一个字符" + peekedToken);
+            // System.out.println("下一个字符" + peekedToken);
             peekedToken = null;
             return token;
         } else {
             Token xxx = tokenizer.nextToken();
-//            System.out.println("下一个字符" + xxx);
+            // System.out.println("下一个字符" + xxx);
             return xxx;
         }
     }
