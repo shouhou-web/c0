@@ -56,7 +56,7 @@ public class SymbolTable {
             find = find.fatherTable;
         }
         entry.order = find.variableOrder++;
-        symbolTable.put(entry.getValue(), entry);
+        find.getSymbolTable().put(entry.getValue(), entry);
         return entry;
     }
 
@@ -67,7 +67,7 @@ public class SymbolTable {
             find = find.fatherTable;
         }
         entry.order = find.variableOrder++;
-        symbolTable.put(name, entry);
+        find.getSymbolTable().put(name, entry);
         return entry;
     }
 

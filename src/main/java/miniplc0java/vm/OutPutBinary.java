@@ -8,6 +8,7 @@ import miniplc0java.analyser.SymbolType;
 import miniplc0java.instruction.Instruction;
 import miniplc0java.instruction.Operation;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class OutPutBinary {
@@ -93,60 +94,21 @@ public class OutPutBinary {
             for (Instruction instruction : instructions) {
                 // type
                 Operation opt = instruction.getOpt();
+                System.out.println(opt.getOptnum());
                 List<Byte> type = int2bytes(1, opt.getOptnum());
                 output.addAll(type);
                 // todo:这里有问题
                 System.out.println(instruction.toString());
                 if (instruction.getType() > 0) {
                     List<Byte> x;
+                    System.out.println(instruction.getX());
                     if (instruction.getType() == 1)
-                        x = long2bytes(4, 0);
-                    else x = long2bytes(8, 0);
+                        x = int2bytes(4, (int) instruction.getX());
+                    else x = long2bytes(8, (long) instruction.getX());
                     output.addAll(x);
                 }
             }
         }
-//
-//        for (int i = 0; i < functionTables.size(); i++) {
-//            Function oneFunction = functionTables.get(i);
-//
-//            // 函数名
-//            List<Byte> name = int2bytes(4, oneFunction.getOrder());
-//            output.addAll(name);
-//
-//            // 返回值
-//            List<Byte> retSlots = int2bytes(4, oneFunction.getRet_slots());
-//            output.addAll(retSlots);
-//
-//            // 参数
-//            List<Byte> paramsSlots = int2bytes(4, oneFunction.getParam_slots());
-//            output.addAll(paramsSlots);
-//
-//            // 局部变量
-//            List<Byte> locSlots = int2bytes(4, oneFunction.getLoc_slots());
-//            output.addAll(locSlots);
-//
-//            // 函数体指令
-//            ArrayList<Instruction> instructions = oneFunction.getBody();
-//            List<Byte> bodyCount = int2bytes(4, instructions.size());
-//            output.addAll(bodyCount);
-//
-//            // 指令集
-//            for (Instruction instruction : instructions) {
-//                // type
-//                Operation opt = instruction.getOpt();
-//                List<Byte> type = int2bytes(1, opt.getOptnum());
-//                output.addAll(type);
-//
-//                if (instruction.getType() > 0) {
-//                    List<Byte> x;
-//                    if (instruction.getType() == 2)
-//                        x = long2bytes(8, 0);
-//                    else x = long2bytes(4, 0);
-//                    output.addAll(x);
-//                }
-//            }
-//        }
         return output;
     }
 
@@ -192,4 +154,14 @@ public class OutPutBinary {
         }
         return bytes;
     }
+
+//    public static ArrayList<Byte> int2bytes(int num) {
+//        ByteBuffer buffer = ByteBuffer.allocate(4);
+//        buffer.putInt(0, num);
+//        ArrayList<Byte> res = new ArrayList<>();
+//        for (byte b : buffer.array()) {
+//            res.add(b);
+//        }
+//        return res;
+//    }
 }

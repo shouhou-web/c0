@@ -245,9 +245,7 @@ public enum Operation {
     }
 
     public int getOptnum() {
-        String s = "" + opt;
-        int ret = Integer.parseInt(s, 16);
-        return ret;
+        return opt;
     }
 
 

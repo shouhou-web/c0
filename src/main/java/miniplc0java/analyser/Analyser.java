@@ -327,6 +327,10 @@ public class Analyser {
 
         // 退出域
         exitDomain();
+
+        // 重置初始
+        addInstruction(Operation.ret);
+        curFunc = funcTable.get("_start");
     }
 
     private void analyseFunctionParamList() throws CompileError {
@@ -857,7 +861,8 @@ public class Analyser {
                     return new SymbolEntry(analyseStdFunc(name));
                 } else {
                     // 分配空间
-                    addInstruction(Operation.stackalloc, 1);
+                    if (func.ret_type != TokenType.VOID_KW)
+                        addInstruction(Operation.stackalloc, 1);
                     if (nextIf(TokenType.R_PAREN) == null) {
                         // 分析传参
                         var expr = analyseExprA();
@@ -867,6 +872,7 @@ public class Analyser {
                         expect(TokenType.R_PAREN);
                         addInstruction(Operation.callname, this.funcTable.get(name).order);
                     }
+                    addInstruction(Operation.ret);
                     // 函数返回
                     if (func.ret_type == TokenType.VOID_KW)
                         return new SymbolEntry(TokenType.VOID_KW);
@@ -906,7 +912,7 @@ public class Analyser {
             // String
             System.out.println("233:" + nameToken.getValue().toString());
             SymbolEntry entry = addGlobalString(nameToken.getValue().toString());
-            addInstruction(Operation.push, entry.order);
+            addInstruction(Operation.push, (long) entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);
         }
         throw new ExpectedTokenError(TokenType.Uint_LITERAL, peekedToken);
