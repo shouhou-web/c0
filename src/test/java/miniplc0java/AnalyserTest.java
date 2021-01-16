@@ -25,7 +25,7 @@ public class AnalyserTest {
     public void test() {
         InputStream input;
         String inputFileName = "D:\\北京航空航天大学\\大三学习资料\\编译原理\\c0\\src\\main\\java\\miniplc0java\\in.txt";
-        String outputFileName = "D:\\北京航空航天大学\\大三学习资料\\编译原理\\c0\\src\\main\\java\\miniplc0java\\out.txt";
+        String outputFileName = "D:\\北京航空航天大学\\大三学习资料\\编译原理\\c0\\src\\main\\java\\miniplc0java\\out.o0";
         try {
             input = new FileInputStream(inputFileName);
         } catch (FileNotFoundException e) {

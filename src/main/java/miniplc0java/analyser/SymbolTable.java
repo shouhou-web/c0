@@ -112,4 +112,8 @@ public class SymbolTable {
     public int getSize() {
         return size;
     }
+
+    public LinkedHashMap<String, SymbolEntry> getSymbolTable() {
+        return symbolTable;
+    }
 }

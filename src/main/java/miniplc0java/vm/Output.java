@@ -51,4 +51,14 @@ public class Output {
             chs[size - 1 - i] = (char) (((num >> i) & 1) + '0');
         return new String(chs);
     }
+
+    @Override
+    public String toString() {
+        return "Output{" +
+                "magic='" + magic + '\'' +
+                ", version='" + version + '\'' +
+                ", symbolTable=" + symbolTable.toString() +
+                ", funcTable=" + funcTable.toString() +
+                '}';
+    }
 }

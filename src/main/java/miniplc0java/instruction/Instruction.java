@@ -88,11 +88,7 @@ public class Instruction {
         this.x = x;
     }
 
-    @Override
-    public String toString() {
-        switch (this.opt) {
-            default:
-                return "ILL";
-        }
+    public int getType() {
+        return type;
     }
 }

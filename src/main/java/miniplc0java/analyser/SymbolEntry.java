@@ -88,6 +88,14 @@ public class SymbolEntry {
         return new String(chs);
     }
 
+    public SymbolType getSymbolType() {
+        return symbolType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
     /**
      * @return the stackOffset
      */

@@ -4,6 +4,7 @@ import miniplc0java.analyser.*;
 import miniplc0java.error.CompileError;
 import miniplc0java.tokenizer.StringIter;
 import miniplc0java.tokenizer.Tokenizer;
+import miniplc0java.vm.OutPutBinary;
 import miniplc0java.vm.Output;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -12,9 +13,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Scanner;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -66,11 +66,12 @@ public class App {
 
         var analyzer = new Analyser(tokenizer);
         analyzer.analyse();
-        Output answer = new Output(analyzer.currentTable, analyzer.funcTable);
-        String answerCode = answer.toVmCode();
-        System.out.println(answer.toVmCode());
-        byte[] bytes = answerCode.getBytes();
-        output.write(bytes);
+        OutPutBinary answer = new OutPutBinary(analyzer.currentTable, analyzer.funcTable);
+        List<Byte> bytes = answer.generate();
+        for (int i = 0; i < bytes.size(); i++) {
+            Byte b = bytes.get(i);
+            output.write(b);
+        }
     }
 
     private static ArgumentParser buildArgparse() {
@@ -82,6 +83,16 @@ public class App {
                 .action(Arguments.store());
         parser.addArgument("file").required(true).dest("input").action(Arguments.store()).help("Input file");
         return parser;
+    }
+
+    private static ArrayList<Byte> handleInt(int num) {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.putInt(0, num);
+        ArrayList<Byte> res = new ArrayList<>();
+        for (byte b : buffer.array()) {
+            res.add(b);
+        }
+        return res;
     }
 
     private static Tokenizer tokenize(StringIter iter) {

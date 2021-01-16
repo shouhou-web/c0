@@ -97,4 +97,36 @@ public class Function {
             chs[Integer.SIZE - 1 - i] = (char) (((num >> i) & 1) + '0');
         return new String(chs);
     }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public int getLoc_slots() {
+        return loc_slots;
+    }
+
+    public int getBody_count() {
+        return body_count;
+    }
+
+    public int getParam_slots() {
+        return param_slots;
+    }
+
+    public ArrayList<Instruction> getBody() {
+        return body;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRet_slots() {
+        return ret_slots;
+    }
+
+    public TokenType getRet_type() {
+        return ret_type;
+    }
 }
