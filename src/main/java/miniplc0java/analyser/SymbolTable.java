@@ -4,7 +4,9 @@ import miniplc0java.error.CompileError;
 import miniplc0java.error.ErrorCode;
 import miniplc0java.util.Pos;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SymbolTable {
     // father table
@@ -18,6 +20,9 @@ public class SymbolTable {
 
     // 变量的顺序
     int variableOrder = 0;
+
+    // 变量表大小
+    int size;
 
     // init 设置fatherTable为null
     public SymbolTable() {
@@ -78,5 +83,23 @@ public class SymbolTable {
                 }
             };
         return find.symbolTable.get(name);
+    }
+
+    // 生成代码
+    public String toVmCode() {
+        Iterator iter = symbolTable.entrySet().iterator();
+        StringBuilder stringBuilder = new StringBuilder();
+        while (iter.hasNext()) {
+            this.size += 1;
+            var entry = (Map.Entry) iter.next();
+            SymbolEntry symbolEntry = (SymbolEntry) entry.getValue();
+            stringBuilder.append(symbolEntry.toVmCode());
+        }
+        return stringBuilder.toString();
+    }
+
+    // 获取大小
+    public int getSize() {
+        return size;
     }
 }

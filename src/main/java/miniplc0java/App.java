@@ -1,15 +1,91 @@
 package miniplc0java;
 
+import miniplc0java.analyser.*;
+import miniplc0java.error.CompileError;
+import miniplc0java.tokenizer.StringIter;
+import miniplc0java.tokenizer.Tokenizer;
+import miniplc0java.vm.Output;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Scanner;
+
 public class App {
-    public static void main(String[] args) {
-        System.out.println(toFullBinaryString(32, 8));
-        ;
+    public static void main(String[] args) throws CompileError {
+        var argparse = buildArgparse();
+        Namespace result;
+        try {
+            result = argparse.parseArgs(args);
+        } catch (ArgumentParserException e1) {
+            argparse.handleError(e1);
+            return;
+        }
+
+        var inputFileName = result.getString("input");
+        var outputFileName = result.getString("asm");
+        System.out.println(inputFileName + " " + outputFileName);
+
+        InputStream input;
+        if (inputFileName.equals("-")) {
+            input = System.in;
+        } else {
+            try {
+                input = new FileInputStream(inputFileName);
+            } catch (FileNotFoundException e) {
+                System.err.println("Cannot find input file.");
+                e.printStackTrace();
+                System.exit(2);
+                return;
+            }
+        }
+
+        PrintStream output;
+        if (outputFileName.equals("-")) {
+            output = System.out;
+        } else {
+            try {
+                output = new PrintStream(new FileOutputStream(outputFileName));
+            } catch (FileNotFoundException e) {
+                System.err.println("Cannot open output file.");
+                e.printStackTrace();
+                System.exit(2);
+                return;
+            }
+        }
+
+        Scanner scanner;
+        scanner = new Scanner(input);
+        var iter = new StringIter(scanner);
+        var tokenizer = tokenize(iter);
+
+        var analyzer = new Analyser(tokenizer);
+        analyzer.analyse();
+        Output answer= new Output(analyzer.currentTable,analyzer.funcTable);
+
+        System.out.println(answer.toVmCode());
+        output.print(answer.toVmCode());
+
     }
 
-    public static String toFullBinaryString(int num, int size) {
-        char[] chs = new char[size];
-        for (int i = 0; i < size; i++)
-            chs[size - 1 - i] = (char) (((num >> i) & 1) + '0');
-        return new String(chs);
+    private static ArgumentParser buildArgparse() {
+        var builder = ArgumentParsers.newFor("miniplc0-java");
+        var parser = builder.build();
+        parser.addArgument("-t", "--tokenize").help("Tokenize the input").action(Arguments.storeTrue());
+        parser.addArgument("-l", "--analyse").help("Analyze the input").action(Arguments.storeTrue());
+        parser.addArgument("-o", "--output").help("Set the output file").required(true).dest("asm")
+                .action(Arguments.store());
+        parser.addArgument("file").required(true).dest("input").action(Arguments.store()).help("Input file");
+        return parser;
+    }
+
+    private static Tokenizer tokenize(StringIter iter) {
+        var tokenizer = new Tokenizer(iter);
+        return tokenizer;
     }
 }

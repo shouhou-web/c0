@@ -28,12 +28,12 @@ public class Analyser {
     /**
      * 当前的符号表
      */
-    SymbolTable currentTable = new SymbolTable();
+    public SymbolTable currentTable = new SymbolTable();
 
     /**
      * 全局函数表
      */
-    LinkedHashMap<String, Function> funcTable = new LinkedHashMap<>();
+    public LinkedHashMap<String, Function> funcTable = new LinkedHashMap<>();
 
     /**
      * 当前分析的函数
