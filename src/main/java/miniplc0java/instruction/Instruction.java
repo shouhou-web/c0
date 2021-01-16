@@ -91,4 +91,13 @@ public class Instruction {
     public int getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return "Instruction{" +
+                "opt=" + opt +
+                ", type=" + type +
+                ", x=" + x +
+                '}';
+    }
 }

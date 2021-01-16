@@ -111,12 +111,14 @@ public class OutPutBinary {
                 Operation opt = instruction.getOpt();
                 List<Byte> type = int2bytes(1, opt.getOptnum());
                 output.addAll(type);
-
+                // todo:这里有问题
+                System.out.println(instruction.toString());
                 if (instruction.getType() > 0) {
                     List<Byte> x;
-                    if (instruction.getType() == 2)
-                        x = long2bytes(8, 0);
-                    else x = long2bytes(4, 0);
+                    if (instruction.getType() == 1)
+                        x = long2bytes(4, 0);
+                    else x = long2bytes(8, 0);
+                    System.out.println(x);
                     output.addAll(x);
                 }
             }

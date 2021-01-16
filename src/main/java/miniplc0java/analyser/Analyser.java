@@ -47,6 +47,8 @@ public class Analyser {
 
     public LinkedHashMap<String, Function> analyse() throws CompileError {
         analyseProgram();
+        int order = currentTable.get("main").order;
+        addInstruction(Operation.callname, order);
         return funcTable;
     }
 

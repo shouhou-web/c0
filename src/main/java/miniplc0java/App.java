@@ -65,6 +65,7 @@ public class App {
         analyzer.analyse();
         OutPutBinary answer = new OutPutBinary(analyzer.currentTable, analyzer.funcTable);
         List<Byte> bytes = answer.generate();
+        System.out.println(bytes);
         for (Byte b : bytes)
             output.write(b);
     }
