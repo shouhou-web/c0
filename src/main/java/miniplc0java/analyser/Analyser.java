@@ -71,9 +71,9 @@ public class Analyser {
         currentTable.putParam(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.PARAM));
     }
 
-    private SymbolEntry addGlobalSymbolVariable(TokenType type) throws CompileError {
+    private SymbolEntry addGlobalSymbolVariable(String value) throws CompileError {
         // 区分全局和函数内
-        return currentTable.putGlobalVariable(new SymbolEntry(false, false, type, SymbolType.GLOBAL_STRING));
+        return currentTable.putGlobalVariable(new SymbolEntry(false, false, TokenType.STRING_LITEREAL, SymbolType.GLOBAL_STRING, value));
     }
 
     /**
@@ -894,8 +894,9 @@ public class Analyser {
             addInstruction(Operation.push, (Double) nameToken.getValue());
             return new SymbolEntry(true, TokenType.DOUBLE_KW);
         } else if (tt == TokenType.STRING_LITEREAL) {
-            // todo:String还没写
-            SymbolEntry entry = addGlobalSymbolVariable(TokenType.STRING_LITEREAL);
+            // String
+            System.out.println("233:"+nameToken.getValue().toString());
+            SymbolEntry entry = addGlobalSymbolVariable(nameToken.getValue().toString());
             addInstruction(Operation.push, entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);
         }

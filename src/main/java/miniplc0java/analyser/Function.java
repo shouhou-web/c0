@@ -84,8 +84,7 @@ public class Function {
         stringBuilder.append(toFullBinaryString(loc_slots));
         stringBuilder.append(toFullBinaryString(body_count));
         if (body.size() > 0)
-            for (Instruction instruction : body
-            ) {
+            for (Instruction instruction : body) {
                 stringBuilder.append(instruction.toVmCode());
             }
         return stringBuilder.toString();

@@ -54,8 +54,8 @@ public class SymbolTable {
         while (find.fatherTable != null) {
             find = find.fatherTable;
         }
-        entry.order = ++variableOrder;
-        symbolTable.put("string" + entry.order, entry);
+        entry.order = ++find.variableOrder;
+        find.putVariable("string" + entry.order, entry);
         return entry;
     }
 
