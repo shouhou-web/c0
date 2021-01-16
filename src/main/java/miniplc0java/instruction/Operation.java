@@ -247,4 +247,12 @@ public enum Operation {
     public int getOptnum() {
         return opt;
     }
+
+
+    public String toString(Operation o) {
+        return "Operation{" +
+                o +
+                " opt=" + opt +
+                '}';
+    }
 }

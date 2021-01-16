@@ -120,12 +120,12 @@ public class Analyser {
     private Token next() throws TokenizeError {
         if (peekedToken != null) {
             var token = peekedToken;
-            System.out.println("下一个字符" + peekedToken);
+//            System.out.println("下一个字符" + peekedToken);
             peekedToken = null;
             return token;
         } else {
             Token xxx = tokenizer.nextToken();
-            System.out.println("下一个字符" + xxx);
+//            System.out.println("下一个字符" + xxx);
             return xxx;
         }
     }
@@ -712,7 +712,6 @@ public class Analyser {
             }
             return new SymbolEntry(TokenType.BOOLEAN_KW);
         }
-        System.out.println("这里是否正确退出B");
         return exprB;
     }
 
@@ -744,7 +743,6 @@ public class Analyser {
             // 返回
             exprC = new SymbolEntry(true, exprC.type);
         }
-        System.out.println("这里是否正确退出C");
         return exprC;
     }
 
@@ -776,7 +774,6 @@ public class Analyser {
             }
             exprD = new SymbolEntry(true, exprD.type);
         }
-        System.out.println("这里是否正确退出D");
         return exprD;
     }
 
@@ -794,7 +791,6 @@ public class Analyser {
                 throwError(ErrorCode.InvalidAs);
             return new SymbolEntry(true, typeToken);
         }
-        System.out.println("这里是否正确退出E");
         return exprE;
     }
 
@@ -841,13 +837,11 @@ public class Analyser {
                     throwError(ErrorCode.FuncNotExist);
                 else if (isStdFunc(name)) {
                     if (nextIf(TokenType.R_PAREN) == null) {
-                        System.out.println("进入传参");
                         // 分析传参
                         var expr = analyseExprA();
                         while (nextIf(TokenType.COMMA) != null) {
                             expr = analyseExprA();
                         }
-                        System.out.println("结束传参");
 
                         expect(TokenType.R_PAREN);
                     }
@@ -890,10 +884,8 @@ public class Analyser {
 
     private SymbolEntry analyseExprI() throws CompileError {
         // I -> UINT_LITERAL | DOUBLE_LITERAL | STRING_LITERAL | CHAR_LITERAL
-        System.out.println("这里进来了两边？");
         var nameToken = next();
         TokenType tt = nameToken.getTokenType();
-        System.out.println(tt.toString());
 
         if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
             addInstruction(Operation.push, (long) nameToken.getValue());

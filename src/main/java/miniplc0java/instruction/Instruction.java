@@ -43,6 +43,7 @@ public class Instruction {
 
     public String toVmCode() {
         StringBuilder stringBuilder = new StringBuilder();
+        System.out.println(opt.toString());
         // 加入指令编号
         stringBuilder.append(toFullBinaryString(opt.getOptnum(), 8));
         // 有参数的加入占位

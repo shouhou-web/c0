@@ -55,7 +55,7 @@ public class AnalyserTest {
             analyzer.analyse();
             Output answer= new Output(analyzer.currentTable,analyzer.funcTable);
 
-            System.out.println(answer.toVmCode());
+//            System.out.println(answer.toVmCode());
             output.print(answer.toVmCode());
         } catch (Exception e) {
             e.printStackTrace();
