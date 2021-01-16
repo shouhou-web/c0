@@ -8,7 +8,6 @@ import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.vm.OutPutBinary;
-import miniplc0java.vm.Output;
 import org.junit.Test;
 
 import java.io.*;

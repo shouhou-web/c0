@@ -96,6 +96,19 @@ public class SymbolEntry {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return "SymbolEntry{" +
+                "isConstant=" + isConstant +
+                ", isInitialized=" + isInitialized +
+                ", symbolType=" + symbolType +
+                ", type=" + type +
+                ", order=" + order +
+                ", stackOffset=" + stackOffset +
+                ", value='" + value + '\'' +
+                '}';
+    }
+
     /**
      * @return the stackOffset
      */

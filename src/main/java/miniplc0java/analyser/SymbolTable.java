@@ -37,25 +37,37 @@ public class SymbolTable {
     // 添加参数
     public void putParam(String name, SymbolEntry entry) throws CompileError {
         checkDuplicateDeclaration(name);
-        entry.order = ++paramOrder;
+        entry.order = paramOrder++;
         symbolTable.put(name, entry);
     }
 
     // 添加变量
     public SymbolEntry putVariable(String name, SymbolEntry entry) throws CompileError {
         checkDuplicateDeclaration(name);
-        entry.order = ++variableOrder;
+        entry.order = variableOrder++;
         symbolTable.put(name, entry);
         return entry;
     }
 
-    public SymbolEntry putGlobalVariable(SymbolEntry entry) throws CompileError {
+    // 添加全局string
+    public SymbolEntry putGlobalString(SymbolEntry entry) throws CompileError {
         SymbolTable find = this;
         while (find.fatherTable != null) {
             find = find.fatherTable;
         }
-        entry.order = ++find.variableOrder;
-        find.putVariable(entry.getValue(), entry);
+        entry.order = find.variableOrder++;
+        symbolTable.put(entry.getValue(), entry);
+        return entry;
+    }
+
+    // 添加全局函数
+    public SymbolEntry putGlobalFunc(String name, SymbolEntry entry) throws CompileError {
+        SymbolTable find = this;
+        while (find.fatherTable != null) {
+            find = find.fatherTable;
+        }
+        entry.order = find.variableOrder++;
+        symbolTable.put(name, entry);
         return entry;
     }
 

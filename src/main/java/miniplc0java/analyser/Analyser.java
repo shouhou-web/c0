@@ -41,7 +41,8 @@ public class Analyser {
     Function curFunc;
 
 
-    public Analyser(Tokenizer tokenizer) {
+    public Analyser(Tokenizer tokenizer) throws CompileError {
+        init_start();
         this.tokenizer = tokenizer;
     }
 
@@ -50,6 +51,10 @@ public class Analyser {
         int order = currentTable.get("main").order;
         addInstruction(Operation.callname, order);
         return funcTable;
+    }
+
+    public void init_start() throws CompileError {
+        addFunc("_start");
     }
 
     /**
@@ -63,6 +68,9 @@ public class Analyser {
      */
     private SymbolEntry addSymbolVariable(String name, boolean isConstant, boolean isInitialized, TokenType type, Pos curPos) throws CompileError {
         // 区分全局和函数内
+        // 增加局部变量数
+        curFunc.incLoc_slots();
+
         if (currentTable.fatherTable == null)
             return currentTable.putVariable(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.ALL));
         else
@@ -70,28 +78,32 @@ public class Analyser {
     }
 
     private void addSymbolParam(String name, boolean isConstant, boolean isInitialized, TokenType type, Pos curPos) throws CompileError {
+        // 增加参数个数
+        curFunc.incParam_slots();
+
         currentTable.putParam(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.PARAM));
     }
 
-    private SymbolEntry addGlobalSymbolVariable(String value) throws CompileError {
-        // 区分全局和函数内
-        return currentTable.putGlobalVariable(new SymbolEntry(false, false, TokenType.STRING_LITEREAL, SymbolType.GLOBAL_STRING, value));
+    private SymbolEntry addGlobalString(String value) throws CompileError {
+        // 增加参数个数
+        curFunc.incLoc_slots();
+
+        return currentTable.putGlobalString(new SymbolEntry(false, false, TokenType.STRING_LITEREAL, SymbolType.GLOBAL_STRING, value));
     }
 
     /**
      * 添加一个函数
      *
-     * @param name   名字
-     * @param curPos 当前 func 的位置（报错用）
+     * @param name 名字
      * @throws CompileError 如果重复定义了则抛异常
      */
-    private void addFunc(String name, Pos curPos) throws CompileError {
+    private void addFunc(String name) throws CompileError {
         if (funcTable.get(name) != null)
-            throw new AnalyzeError(ErrorCode.DuplicateFunction, curPos);
+            throwError(ErrorCode.DuplicateFunction);
         else {
             var func = new Function(name);
             // 将函数名加入变量表
-            currentTable.putGlobalVariable(new SymbolEntry(false, false, TokenType.FUNCTION_KW, SymbolType.Function, name));
+            currentTable.putGlobalFunc(name, new SymbolEntry(false, false, TokenType.FUNCTION_KW, SymbolType.Function, name));
             // 设置当前分析的函数
             curFunc = func;
             // 设置其在全局变量表中的位置
@@ -292,7 +304,7 @@ public class Analyser {
         // 加入函数表
         var nameToken = expect(TokenType.IDENT);
         String name = nameToken.getValueString();
-        addFunc(name, nameToken.getStartPos());
+        addFunc(name);
 
         // 进入一个新的域
         newDomain();
@@ -350,9 +362,6 @@ public class Analyser {
 
         // 加入符号表
         addSymbolParam(name, isConstant, false, typeToken, nameToken.getStartPos());
-
-        // 增加参数个数
-        curFunc.incParam_slots();
     }
 
     private void analyseStmt() throws CompileError {
@@ -435,8 +444,6 @@ public class Analyser {
         else if (check(TokenType.CONST_KW))
             analyseConst_Decl_Stmt();
 
-        // 增加局部变量数
-        curFunc.incLoc_slots();
     }
 
     private void analyseLet_Decl_Stmt() throws CompileError {
@@ -898,7 +905,7 @@ public class Analyser {
         } else if (tt == TokenType.STRING_LITEREAL) {
             // String
             System.out.println("233:" + nameToken.getValue().toString());
-            SymbolEntry entry = addGlobalSymbolVariable(nameToken.getValue().toString());
+            SymbolEntry entry = addGlobalString(nameToken.getValue().toString());
             addInstruction(Operation.push, entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);
         }

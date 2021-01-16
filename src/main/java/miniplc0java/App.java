@@ -5,7 +5,6 @@ import miniplc0java.error.CompileError;
 import miniplc0java.tokenizer.StringIter;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.vm.OutPutBinary;
-import miniplc0java.vm.Output;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;

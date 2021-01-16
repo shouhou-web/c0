@@ -75,29 +75,6 @@ public class Function {
         this.order = order;
     }
 
-
-    public String toVmCode() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(toFullBinaryString(order));
-        stringBuilder.append(toFullBinaryString(ret_slots));
-        stringBuilder.append(toFullBinaryString(param_slots));
-        stringBuilder.append(toFullBinaryString(loc_slots));
-        stringBuilder.append(toFullBinaryString(body_count));
-        if (body.size() > 0)
-            for (Instruction instruction : body) {
-                stringBuilder.append(instruction.toVmCode());
-            }
-        return stringBuilder.toString();
-    }
-
-    //将整数num转化为32位的二进制数
-    public static String toFullBinaryString(int num) {
-        char[] chs = new char[Integer.SIZE];
-        for (int i = 0; i < Integer.SIZE; i++)
-            chs[Integer.SIZE - 1 - i] = (char) (((num >> i) & 1) + '0');
-        return new String(chs);
-    }
-
     public int getOrder() {
         return order;
     }
@@ -128,5 +105,19 @@ public class Function {
 
     public TokenType getRet_type() {
         return ret_type;
+    }
+
+    @Override
+    public String toString() {
+        return "Function{" +
+                "name='" + name + '\'' +
+                ", order=" + order +
+                ", ret_slots=" + ret_slots +
+                ", ret_type=" + ret_type +
+                ", param_slots=" + param_slots +
+                ", loc_slots=" + loc_slots +
+                ", body_count=" + body_count +
+                ", body=" + body +
+                '}';
     }
 }
