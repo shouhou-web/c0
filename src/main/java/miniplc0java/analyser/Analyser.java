@@ -120,10 +120,13 @@ public class Analyser {
     private Token next() throws TokenizeError {
         if (peekedToken != null) {
             var token = peekedToken;
+            System.out.println("下一个字符" + peekedToken);
             peekedToken = null;
             return token;
         } else {
-            return tokenizer.nextToken();
+            Token xxx = tokenizer.nextToken();
+            System.out.println("下一个字符" + xxx);
+            return xxx;
         }
     }
 
@@ -662,6 +665,7 @@ public class Analyser {
             exprA.setInitialized(true);
             return new SymbolEntry(TokenType.VOID_KW);
         }
+
         return exprA;
     }
 
@@ -708,6 +712,7 @@ public class Analyser {
             }
             return new SymbolEntry(TokenType.BOOLEAN_KW);
         }
+        System.out.println("这里是否正确退出B");
         return exprB;
     }
 
@@ -739,6 +744,7 @@ public class Analyser {
             // 返回
             exprC = new SymbolEntry(true, exprC.type);
         }
+        System.out.println("这里是否正确退出C");
         return exprC;
     }
 
@@ -770,6 +776,7 @@ public class Analyser {
             }
             exprD = new SymbolEntry(true, exprD.type);
         }
+        System.out.println("这里是否正确退出D");
         return exprD;
     }
 
@@ -787,6 +794,7 @@ public class Analyser {
                 throwError(ErrorCode.InvalidAs);
             return new SymbolEntry(true, typeToken);
         }
+        System.out.println("这里是否正确退出E");
         return exprE;
     }
 
@@ -805,7 +813,7 @@ public class Analyser {
                 addInstruction(Operation.negi);
             else if (exprF.type == TokenType.DOUBLE_KW)
                 addInstruction(Operation.negf);
-        return analyseExprG();
+        return exprF;
     }
 
     private SymbolEntry analyseExprG() throws CompileError {
@@ -833,11 +841,14 @@ public class Analyser {
                     throwError(ErrorCode.FuncNotExist);
                 else if (isStdFunc(name)) {
                     if (nextIf(TokenType.R_PAREN) == null) {
+                        System.out.println("进入传参");
                         // 分析传参
                         var expr = analyseExprA();
                         while (nextIf(TokenType.COMMA) != null) {
                             expr = analyseExprA();
                         }
+                        System.out.println("结束传参");
+
                         expect(TokenType.R_PAREN);
                     }
                     return new SymbolEntry(analyseStdFunc(name));
@@ -879,19 +890,21 @@ public class Analyser {
 
     private SymbolEntry analyseExprI() throws CompileError {
         // I -> UINT_LITERAL | DOUBLE_LITERAL | STRING_LITERAL | CHAR_LITERAL
-        var nameToken = peek();
+        System.out.println("这里进来了两边？");
+        var nameToken = next();
         TokenType tt = nameToken.getTokenType();
         System.out.println(tt.toString());
+
         if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
             addInstruction(Operation.push, (long) nameToken.getValue());
             return new SymbolEntry(true, TokenType.INT_KW);
-        } else if (nextIf(TokenType.DOUBLE_LITERAL) != null) {
+        } else if (tt == TokenType.DOUBLE_LITERAL) {
             addInstruction(Operation.push, (Double) nameToken.getValue());
             return new SymbolEntry(true, TokenType.DOUBLE_KW);
-        } else if (nextIf(TokenType.STRING_LITEREAL) != null) {
+        } else if (tt == TokenType.STRING_LITEREAL) {
             // todo:String还没写
-//            addGlobalSymbolVariable();
-            addInstruction(Operation.push, (Double) nameToken.getValue());
+            SymbolEntry entry = addGlobalSymbolVariable(TokenType.STRING_LITEREAL);
+            addInstruction(Operation.push, entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);
         }
         throw new ExpectedTokenError(TokenType.Uint_LITERAL, peekedToken);
