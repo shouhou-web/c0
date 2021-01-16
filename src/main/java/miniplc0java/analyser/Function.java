@@ -20,7 +20,7 @@ public class Function {
     // 指令数目
     int body_count;
     // 指令集合
-    ArrayList<Instruction> body;
+    ArrayList<Instruction> body = new ArrayList<Instruction>();
 
     /**
      * @param name 函数名
@@ -83,10 +83,11 @@ public class Function {
         stringBuilder.append(toFullBinaryString(param_slots));
         stringBuilder.append(toFullBinaryString(loc_slots));
         stringBuilder.append(toFullBinaryString(body_count));
-        for (Instruction instruction : body
-        ) {
-            stringBuilder.append(instruction.toVmCode());
-        }
+        if (body.size() > 0)
+            for (Instruction instruction : body
+            ) {
+                stringBuilder.append(instruction.toVmCode());
+            }
         return stringBuilder.toString();
     }
 

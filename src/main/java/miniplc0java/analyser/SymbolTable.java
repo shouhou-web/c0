@@ -49,6 +49,16 @@ public class SymbolTable {
         return entry;
     }
 
+    public SymbolEntry putGlobalVariable(SymbolEntry entry) throws CompileError {
+        SymbolTable find = this;
+        while (find.fatherTable != null) {
+            find = find.fatherTable;
+        }
+        entry.order = ++variableOrder;
+        symbolTable.put("string" + entry.order, entry);
+        return entry;
+    }
+
     private void checkDuplicateDeclaration(String name) throws CompileError {
         if (symbolTable.get(name) != null)
             throw new CompileError() {

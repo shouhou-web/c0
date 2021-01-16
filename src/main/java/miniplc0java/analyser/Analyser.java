@@ -71,6 +71,11 @@ public class Analyser {
         currentTable.putParam(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.PARAM));
     }
 
+    private SymbolEntry addGlobalSymbolVariable(TokenType type) throws CompileError {
+        // 区分全局和函数内
+        return currentTable.putGlobalVariable(new SymbolEntry(false, false, type, SymbolType.GLOBAL_STRING));
+    }
+
     /**
      * 添加一个函数
      *
@@ -823,7 +828,8 @@ public class Analyser {
             if (nextIf(TokenType.L_PAREN) != null) {
                 // 获取函数
                 var func = funcTable.get(name);
-                if (func == null || isStdFunc(name))
+//                System.out.println(name);
+                if (func == null && !isStdFunc(name))
                     throwError(ErrorCode.FuncNotExist);
                 else if (isStdFunc(name)) {
                     if (nextIf(TokenType.R_PAREN) == null) {
@@ -873,8 +879,9 @@ public class Analyser {
 
     private SymbolEntry analyseExprI() throws CompileError {
         // I -> UINT_LITERAL | DOUBLE_LITERAL | STRING_LITERAL | CHAR_LITERAL
-        var nameToken = next();
+        var nameToken = peek();
         TokenType tt = nameToken.getTokenType();
+        System.out.println(tt.toString());
         if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
             addInstruction(Operation.push, (long) nameToken.getValue());
             return new SymbolEntry(true, TokenType.INT_KW);
@@ -883,6 +890,7 @@ public class Analyser {
             return new SymbolEntry(true, TokenType.DOUBLE_KW);
         } else if (nextIf(TokenType.STRING_LITEREAL) != null) {
             // todo:String还没写
+//            addGlobalSymbolVariable();
             addInstruction(Operation.push, (Double) nameToken.getValue());
             return new SymbolEntry(true, TokenType.STRING_KW);
         }

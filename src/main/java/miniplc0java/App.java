@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) throws CompileError {
+    public static void main(String[] args) throws Exception {
         var argparse = buildArgparse();
         Namespace result;
         try {
@@ -45,12 +45,12 @@ public class App {
             }
         }
 
-        PrintStream output;
+        OutputStream output;
         if (outputFileName.equals("-")) {
             output = System.out;
         } else {
             try {
-                output = new PrintStream(new FileOutputStream(outputFileName));
+                output = new FileOutputStream(outputFileName);
             } catch (FileNotFoundException e) {
                 System.err.println("Cannot open output file.");
                 e.printStackTrace();
@@ -66,11 +66,11 @@ public class App {
 
         var analyzer = new Analyser(tokenizer);
         analyzer.analyse();
-        Output answer= new Output(analyzer.currentTable,analyzer.funcTable);
-
+        Output answer = new Output(analyzer.currentTable, analyzer.funcTable);
+        String answerCode = answer.toVmCode();
         System.out.println(answer.toVmCode());
-        output.print(answer.toVmCode());
-
+        byte[] bytes = answerCode.getBytes();
+        output.write(bytes);
     }
 
     private static ArgumentParser buildArgparse() {
