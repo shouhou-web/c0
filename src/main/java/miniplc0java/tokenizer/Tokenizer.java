@@ -302,21 +302,7 @@ public class Tokenizer {
     }
 
     private void skipComment() {
-        it.nextChar();
-        int flag = 0;
-        while (!it.isEOF()) {
-            System.out.print(it.peekChar());
-            if (flag == 1 && it.peekChar() == 'n') {
-                it.nextChar();
-                break;
-            } else if (flag == 1) {
-                flag = 0;
-            } else if (it.peekChar() == '\\') {
-                System.out.println("???");
-                flag = 1;
-            }
-            it.nextChar();
-        }
+        while (it.nextChar() != '\n');
     }
 
     private void skipSpaceCharacters() {
