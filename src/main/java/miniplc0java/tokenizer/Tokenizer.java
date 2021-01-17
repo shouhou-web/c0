@@ -137,7 +137,7 @@ public class Tokenizer {
             }
             return new Token(TokenType.DOUBLE_LITERAL, Double.parseDouble(ret.toString()), prePos, it.currentPos());
         }
-        return new Token(TokenType.Uint_LITERAL, Integer.parseInt(ret.toString()), prePos, it.currentPos());
+        return new Token(TokenType.Uint_LITERAL, Long.parseLong(ret.toString()), prePos, it.currentPos());
     }
 
     private String lexDigit() throws TokenizeError {

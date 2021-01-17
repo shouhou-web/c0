@@ -921,7 +921,7 @@ public class Analyser {
         TokenType tt = nameToken.getTokenType();
 
         if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
-            addInstruction(Operation.push, (long) (int) nameToken.getValue());
+            addInstruction(Operation.push, (long) nameToken.getValue());
             return new SymbolEntry(true, TokenType.INT_KW);
         } else if (tt == TokenType.DOUBLE_LITERAL) {
             addInstruction(Operation.push, (Double) nameToken.getValue());

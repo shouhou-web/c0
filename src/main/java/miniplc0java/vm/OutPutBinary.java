@@ -104,7 +104,12 @@ public class OutPutBinary {
 //                    System.out.println(instruction.getX());
                     if (instruction.getType() == 1)
                         x = int2bytes(4, (int) instruction.getX());
-                    else x = long2bytes(8, (long) instruction.getX());
+                    else {
+                        if (instruction.getX().getClass() == Double.class)
+                            x = handleDouble((Double) instruction.getX());
+                        else
+                            x = long2bytes(8, (long) instruction.getX());
+                    }
                     output.addAll(x);
                 }
             }
@@ -144,6 +149,16 @@ public class OutPutBinary {
             bytes.add((byte) ((target >> (start - i * 8)) & 0xFF));
         }
         return bytes;
+    }
+
+    public ArrayList<Byte> handleDouble(double num) {
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.putDouble(0, num);
+        ArrayList<Byte> res = new ArrayList<>();
+        for (byte b : buffer.array()) {
+            res.add(b);
+        }
+        return res;
     }
 
     private ArrayList<Byte> int2bytes(int length, int target) {
