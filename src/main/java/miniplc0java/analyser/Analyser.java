@@ -821,14 +821,17 @@ public class Analyser {
             // 负号分析
             isNegative = true;
         }
-        SymbolEntry exprF = analyseExprG();
-        if (isNegative)
+        SymbolEntry exprF;
+        if (isNegative) {
+            exprF = analyseExprA();
             if (!exprF.isInitialized)
                 throwError(ErrorCode.NotInitialized);
             else if (exprF.type == TokenType.INT_KW)
                 addInstruction(Operation.negi);
             else if (exprF.type == TokenType.DOUBLE_KW)
                 addInstruction(Operation.negf);
+        } else
+            exprF = analyseExprG();
         return exprF;
     }
 
@@ -847,8 +850,6 @@ public class Analyser {
         if (check(TokenType.IDENT)) {
             var nameToken = expect(TokenType.IDENT);
             String name = nameToken.getValueString();
-            System.out.println();
-            System.out.println("函数名" + name);
             // 是否是函数
             if (nextIf(TokenType.L_PAREN) != null) {
                 // 获取函数
@@ -992,13 +993,13 @@ public class Analyser {
         switch (name) {
             case "getint":
                 addInstruction(Operation.scani);
-                return new SymbolEntry(true,TokenType.INT_KW);
+                return new SymbolEntry(true, TokenType.INT_KW);
             case "getdouble":
                 addInstruction(Operation.scanf);
-                return new SymbolEntry(true,TokenType.DOUBLE_KW);
+                return new SymbolEntry(true, TokenType.DOUBLE_KW);
             case "getchar":
                 addInstruction(Operation.scanc);
-                return new SymbolEntry(true,TokenType.INT_KW);
+                return new SymbolEntry(true, TokenType.INT_KW);
             case "putint":
                 addInstruction(Operation.printi);
                 return new SymbolEntry(TokenType.VOID_KW);
