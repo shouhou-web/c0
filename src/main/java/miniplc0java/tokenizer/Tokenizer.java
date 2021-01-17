@@ -1,5 +1,6 @@
 package miniplc0java.tokenizer;
 
+import miniplc0java.error.CompileError;
 import miniplc0java.error.TokenizeError;
 import miniplc0java.error.ErrorCode;
 
@@ -54,19 +55,15 @@ public class Tokenizer {
         int flag = 0; // 用于判别转义
         while (!it.isEOF()) {
             if (flag == 1) {
-                System.out.println("flag == 1");
-                if (isEscapeSequence(it.peekChar())) {
-                    flag = 0;
-                } else {
-                    System.out.println("flag break");
-                    break;
-                }
+                ret.append(isEscapeSequence(it.peekChar()));
+                flag = 0;
             } else if (it.peekChar() == '\\') {
                 flag = 1;
                 System.out.println("flag = 1");
             } else if (it.peekChar() == '\"')
                 break;
-            ret.append(it.peekChar());
+            else
+                ret.append(it.peekChar());
             it.nextChar();
         }
         // 退出时代表正常结束或者识别错误
@@ -115,8 +112,21 @@ public class Tokenizer {
         return new Token(TokenType.STRING_LITEREAL, ret, prePos, it.currentPos());
     }
 
-    private boolean isEscapeSequence(char c) {
-        return c == '\\' || c == 'r' || c == 'n' || c == 't' || c == '"' || c == '\'';
+    private char isEscapeSequence(char c) throws TokenizeError {
+        if (c == '\\')
+            return '\\';
+        else if (c == 'r')
+            return '\r';
+        else if (c == 'n')
+            return '\n';
+        else if (c == 't')
+            return '\t';
+        else if (c == '"')
+            return '\"';
+        else if (c == '\'')
+            return '\'';
+        else
+            throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
     }
 
     private Token lexUIntOrDouble() throws TokenizeError {
