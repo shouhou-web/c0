@@ -52,14 +52,20 @@ public class Tokenizer {
         it.nextChar();
         StringBuilder ret = new StringBuilder("");
         int flag = 0; // 用于判别转义
-        while (!it.isEOF() && it.peekChar() != '"') {
-            if (flag == 1)
-                if (isEscapeSequence(it.peekChar()))
+        while (!it.isEOF()) {
+            if (flag == 1) {
+                System.out.println("flag == 1");
+                if (isEscapeSequence(it.peekChar())) {
                     flag = 0;
-                else
+                } else {
+                    System.out.println("flag break");
                     break;
-            else if (it.peekChar() == '\\')
+                }
+            } else if (it.peekChar() == '\\') {
                 flag = 1;
+                System.out.println("flag = 1");
+            } else if (it.peekChar() == '\"')
+                break;
             ret.append(it.peekChar());
             it.nextChar();
         }
@@ -240,7 +246,7 @@ public class Tokenizer {
                 return new Token(TokenType.MUL, '*', it.previousPos(), it.currentPos());
             case ':':
                 it.nextChar();
-                return new Token(TokenType.COLON,':', it.previousPos(), it.currentPos());
+                return new Token(TokenType.COLON, ':', it.previousPos(), it.currentPos());
             case '/':
                 // 填入返回语句
                 it.nextChar();

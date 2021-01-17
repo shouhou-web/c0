@@ -468,6 +468,13 @@ public class Analyser {
         // 加入符号表
         SymbolEntry entry = addSymbolVariable(name, false, false, typeToken, nameToken.getStartPos());
 
+//        // todo:全局变量赋值
+//        if (entry.getSymbolType() == SymbolType.ALL) {
+//            addInstruction(Operation.globa, entry.order);
+//            addInstruction(Operation.push, (long) 0);
+//            addInstruction(Operation.store64);
+//        }
+
         // ('=' expr)?
         if (nextIf(TokenType.ASSIGN) != null) {
             // 加载地址
@@ -668,6 +675,8 @@ public class Analyser {
             // todo:删除指令
             popInstruction();
 
+            if (exprA.isConstant)
+                throwError(ErrorCode.ConstantNeedValue);
             checkIfNotTemp(exprA);
             checkIdentInitialized(analyseExprA());
 
@@ -845,7 +854,6 @@ public class Analyser {
             if (nextIf(TokenType.L_PAREN) != null) {
                 // 获取函数
                 var func = funcTable.get(name);
-//                System.out.println(name);
                 if (func == null && !isStdFunc(name))
                     throwError(ErrorCode.FuncNotExist);
                 else if (isStdFunc(name)) {
@@ -870,9 +878,8 @@ public class Analyser {
                             expr = analyseExprA();
                         }
                         expect(TokenType.R_PAREN);
-                        addInstruction(Operation.callname, this.funcTable.get(name).order);
                     }
-                    addInstruction(Operation.ret);
+                    addInstruction(Operation.callname, this.funcTable.get(name).order);
                     // 函数返回
                     if (func.ret_type == TokenType.VOID_KW)
                         return new SymbolEntry(TokenType.VOID_KW);
