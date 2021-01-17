@@ -41,8 +41,11 @@ public class StringIter {
             return;
         }
         while (scanner.hasNext()) {
-            linesBuffer.add(scanner.nextLine() + '\n');
+            var next = scanner.nextLine();
+            System.out.println(next);
+            linesBuffer.add(next + '\n');
         }
+        System.out.println("以下為分析");
         // todo:check read \n?
         initialized = true;
     }
