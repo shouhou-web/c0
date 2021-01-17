@@ -920,8 +920,13 @@ public class Analyser {
         var nameToken = next();
         TokenType tt = nameToken.getTokenType();
 
-        if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
+        if (tt == TokenType.Uint_LITERAL) {
             addInstruction(Operation.push, (long) nameToken.getValue());
+            return new SymbolEntry(true, TokenType.INT_KW);
+        } else if (tt == TokenType.CHAR_LITEREAL) {
+            var c = (int) nameToken.getValue();
+            var s = String.valueOf(c);
+            addInstruction(Operation.push, Long.parseLong(s));
             return new SymbolEntry(true, TokenType.INT_KW);
         } else if (tt == TokenType.DOUBLE_LITERAL) {
             addInstruction(Operation.push, (Double) nameToken.getValue());
