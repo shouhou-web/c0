@@ -43,7 +43,7 @@ public class Analyser {
     /**
      * 当前分析的函数
      */
-    Function curCallFunc;
+    boolean isWhileDomain = false;
 
 
     public Analyser(Tokenizer tokenizer) throws CompileError {
@@ -588,6 +588,8 @@ public class Analyser {
         //  { while }
         expect(TokenType.WHILE_KW);
 
+        isWhileDomain = true;
+
         // 设置开始地址
         int start = getInstructionOffset();
 
@@ -612,12 +614,16 @@ public class Analyser {
 
         // 循环while
         br2.setX(start - end);
+
+        isWhileDomain = false;
     }
 
     private void analyseBreak_Stmt() throws CompileError {
         // break_stmt -> 'break' ';'
         // { break }
         // todo:【加分】break的代码生成
+        if (!isWhileDomain)
+            throwError(ErrorCode.NotWhileDomain);
         expect(TokenType.BREAK_KW);
         expect(TokenType.SEMICOLON);
     }
@@ -626,6 +632,8 @@ public class Analyser {
         // continue_stmt -> 'continue' ';'
         // { continue }
         // todo:【加分】continue的代码生成
+        if (!isWhileDomain)
+            throwError(ErrorCode.NotWhileDomain);
         expect(TokenType.CONTINUE_KW);
         expect(TokenType.SEMICOLON);
     }
@@ -804,7 +812,7 @@ public class Analyser {
     private SymbolEntry analyseExprE() throws CompileError {
         // E -> F [ 'as' type ]
         var exprE = analyseExprF();
-        if (nextIf(TokenType.AS_KW) != null) {
+        while (nextIf(TokenType.AS_KW) != null) {
             var typeToken = expectParam_TY();
 
             if (exprE.isInitialized && exprE.type == TokenType.INT_KW && typeToken == TokenType.DOUBLE_KW)
@@ -813,7 +821,7 @@ public class Analyser {
                 addInstruction(Operation.ftoi);
             else
                 throwError(ErrorCode.InvalidAs);
-            return new SymbolEntry(true, typeToken);
+            exprE =  new SymbolEntry(true, typeToken);
         }
         return exprE;
     }

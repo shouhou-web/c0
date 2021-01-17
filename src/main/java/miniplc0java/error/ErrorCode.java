@@ -14,4 +14,5 @@ public enum ErrorCode {
     FuncNotExist, // 函数不存在
     ParamNotExist, // 变量不存在
     NotInitialized, // 未定义
+    NotWhileDomain,
 }
