@@ -33,18 +33,21 @@ public class Tokenizer {
         if (it.isEOF()) {
             return new Token(TokenType.EOF, "", it.currentPos(), it.currentPos());
         }
-
+        Token ret;
         char peek = it.peekChar();
         if (Character.isDigit(peek))
-            return lexUIntOrDouble();
+            ret =  lexUIntOrDouble();
         else if (Character.isAlphabetic(peek) || peek == '_')
-            return lexIdentOrKeyword();
+            ret =  lexIdentOrKeyword();
         else if (peek == '"')
-            return lexString();
+            ret = lexString();
         else if (peek == '\'')
-            return lexChar();
+            ret =  lexChar();
         else
-            return lexOperatorOrUnknown();
+            ret = lexOperatorOrUnknown();
+        if (ret.getTokenType() == TokenType.COMMENT)
+            ret = nextToken();
+        return ret;
     }
 
     private Token lexString() throws TokenizeError {
@@ -241,9 +244,10 @@ public class Tokenizer {
             case '/':
                 // 填入返回语句
                 it.nextChar();
-                if (it.peekChar() == '/')
+                if (it.peekChar() == '/') {
                     skipComment();
-                else
+                    return new Token(TokenType.COMMENT, "xxx", it.previousPos(), it.currentPos());
+                } else
                     return new Token(TokenType.DIV, '/', it.previousPos(), it.currentPos());
             case '=':
                 // 填入返回语句
@@ -302,7 +306,7 @@ public class Tokenizer {
     }
 
     private void skipComment() {
-        while (it.nextChar() != '\n');
+        while (it.nextChar() != '\n') ;
     }
 
     private void skipSpaceCharacters() {

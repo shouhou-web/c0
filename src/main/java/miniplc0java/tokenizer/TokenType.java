@@ -180,6 +180,10 @@ public enum TokenType {
      * 分号
      */
     SEMICOLON,
+    /**
+     * 注释
+     */
+    COMMENT,
     /*** 文件结尾 */
     EOF;
 
