@@ -468,19 +468,13 @@ public class Analyser {
         // 加入符号表
         SymbolEntry entry = addSymbolVariable(name, false, false, typeToken, nameToken.getStartPos());
 
-//        // todo:全局变量赋值
-//        if (entry.getSymbolType() == SymbolType.ALL) {
-//            addInstruction(Operation.globa, entry.order);
-//            addInstruction(Operation.push, (long) 0);
-//            addInstruction(Operation.store64);
-//        }
 
         // ('=' expr)?
         if (nextIf(TokenType.ASSIGN) != null) {
             // 加载地址
             if (entry.symbolType == SymbolType.ALL)
                 addInstruction(Operation.globa, entry.order);
-            else if (entry.symbolType == SymbolType.PARAM)
+            else if (entry.symbolType == SymbolType.VARIABLE)
                 addInstruction(Operation.loca, entry.order);
 
             // 分析表达式
