@@ -10,10 +10,10 @@ public class WhileBlock {
     }
 
     public int getStartOffset(int current) {
-        return startOffset - current ;
+        return startOffset - current;
     }
 
     public int getEndOffset(int current) {
-        return endOffset - current;
+        return endOffset - current - 1;
     }
 }
