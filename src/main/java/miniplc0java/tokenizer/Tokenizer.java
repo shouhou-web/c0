@@ -259,7 +259,10 @@ public class Tokenizer {
             case '/':
                 // 填入返回语句
                 it.nextChar();
-                return new Token(TokenType.DIV, '/', it.previousPos(), it.currentPos());
+                if (it.peekChar() == '/')
+                    skipComment();
+                else
+                    return new Token(TokenType.DIV, '/', it.previousPos(), it.currentPos());
             case '=':
                 // 填入返回语句
                 it.nextChar();
@@ -313,6 +316,26 @@ public class Tokenizer {
             default:
                 // 不认识这个输入，摸了
                 throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
+        }
+    }
+
+    private void skipComment() {
+        it.nextChar();
+        int flag = 0;
+        while (!it.isEOF()) {
+            System.out.print(it.peekChar());
+            if (flag == 1 && it.peekChar() == 'n') {
+                it.nextChar();
+                break;
+            }
+            else if (flag == 1) {
+                flag = 0;
+            }
+            else if (it.peekChar() == '\\') {
+                System.out.println("???");
+                flag = 1;
+            }
+            it.nextChar();
         }
     }
 
