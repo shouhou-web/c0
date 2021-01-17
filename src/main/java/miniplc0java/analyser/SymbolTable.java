@@ -32,6 +32,8 @@ public class SymbolTable {
     // init 设置fatherTable指向父域
     public SymbolTable(SymbolTable currentTable) {
         fatherTable = currentTable;
+        if (currentTable.fatherTable != null)
+            variableOrder = currentTable.variableOrder;
     }
 
     // 添加参数
@@ -43,6 +45,7 @@ public class SymbolTable {
 
     // 添加变量
     public SymbolEntry putVariable(String name, SymbolEntry entry) throws CompileError {
+        SymbolTable find = this;
         checkDuplicateDeclaration(name);
         entry.order = variableOrder++;
         symbolTable.put(name, entry);
