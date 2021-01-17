@@ -329,7 +329,8 @@ public class Analyser {
         exitDomain();
 
         // 重置初始
-        addInstruction(Operation.ret);
+        if (this.curFunc.body.size() == 0 || this.curFunc.body.get(this.curFunc.body.size() - 1).getOpt() != Operation.ret)
+            addInstruction(Operation.ret);
         curFunc = funcTable.get("_start");
     }
 
@@ -554,7 +555,7 @@ public class Analyser {
         int middle = getInstructionOffset();
         // 设置跳转至该位置
         br1.setX(middle - start);
-
+        System.out.println("br1:" + (middle - start));
         if (nextIf(TokenType.ELSE_KW) != null) {
             // ('else' 'if' expr block_stmt)*
             if (check(TokenType.IF_KW))
@@ -573,7 +574,8 @@ public class Analyser {
 
         // 出来的怎么办？直接跳过所有
         int end = getInstructionOffset();
-        br2.setX(end);
+        br2.setX(end - middle);
+        System.out.println("br2:" + (end - middle));
 
     }
 
@@ -647,6 +649,8 @@ public class Analyser {
 
         // ;
         expect(TokenType.SEMICOLON);
+
+        addInstruction(Operation.ret);
     }
 
     private void analyseEmpty_Stmt() throws CompileError {

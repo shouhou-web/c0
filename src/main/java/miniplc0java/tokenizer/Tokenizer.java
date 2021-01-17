@@ -59,7 +59,6 @@ public class Tokenizer {
                 flag = 0;
             } else if (it.peekChar() == '\\') {
                 flag = 1;
-                System.out.println("flag = 1");
             } else if (it.peekChar() == '\"')
                 break;
             else
