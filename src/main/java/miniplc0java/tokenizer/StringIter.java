@@ -102,12 +102,12 @@ public class StringIter {
             char ch = this.peeked.get();
             this.peeked = Optional.empty();
             this.ptr = ptrNext;
-//            System.out.print(ch);
+            System.out.print(ch);
             return ch;
         } else {
             char ch = this.getNextChar();
             this.ptr = ptrNext;
-//            System.out.print(ch);
+            System.out.print(ch);
             return ch;
         }
     }

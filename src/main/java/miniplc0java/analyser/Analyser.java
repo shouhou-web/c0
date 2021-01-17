@@ -366,7 +366,7 @@ public class Analyser {
         var typeToken = expectParam_TY();
 
         // 加入符号表
-        addSymbolParam(name, isConstant, false, typeToken, nameToken.getStartPos());
+        addSymbolParam(name, isConstant, true, typeToken, nameToken.getStartPos());
     }
 
     private void analyseStmt() throws CompileError {
@@ -847,7 +847,8 @@ public class Analyser {
         if (check(TokenType.IDENT)) {
             var nameToken = expect(TokenType.IDENT);
             String name = nameToken.getValueString();
-
+            System.out.println();
+            System.out.println("函数名" + name);
             // 是否是函数
             if (nextIf(TokenType.L_PAREN) != null) {
                 // 获取函数
@@ -864,7 +865,7 @@ public class Analyser {
 
                         expect(TokenType.R_PAREN);
                     }
-                    return new SymbolEntry(analyseStdFunc(name));
+                    return analyseStdFunc(name);
                 } else {
                     // 分配空间
                     if (func.ret_type != TokenType.VOID_KW)
@@ -987,34 +988,34 @@ public class Analyser {
      * @param name 函数名
      * @return Tokentype
      */
-    private TokenType analyseStdFunc(String name) {
+    private SymbolEntry analyseStdFunc(String name) {
         switch (name) {
             case "getint":
                 addInstruction(Operation.scani);
-                return TokenType.INT_KW;
+                return new SymbolEntry(true,TokenType.INT_KW);
             case "getdouble":
                 addInstruction(Operation.scanf);
-                return TokenType.DOUBLE_KW;
+                return new SymbolEntry(true,TokenType.DOUBLE_KW);
             case "getchar":
                 addInstruction(Operation.scanc);
-                return TokenType.INT_KW;
+                return new SymbolEntry(true,TokenType.INT_KW);
             case "putint":
                 addInstruction(Operation.printi);
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
             case "putdouble":
                 addInstruction(Operation.printf);
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
             case "putchar":
                 addInstruction(Operation.printc);
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
             case "putln":
                 addInstruction(Operation.println);
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
             case "putstr":
                 addInstruction(Operation.prints);
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
             default:
-                return TokenType.VOID_KW;
+                return new SymbolEntry(TokenType.VOID_KW);
         }
     }
 
