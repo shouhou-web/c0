@@ -43,7 +43,7 @@ public class OutPutBinary {
         for (Map.Entry<String, SymbolEntry> stringSymbolEntryEntry : globals.entrySet()) {
             var entry = (Map.Entry) stringSymbolEntryEntry;
             SymbolEntry oneGlobalSymbol = (SymbolEntry) entry.getValue();
-            System.out.println(oneGlobalSymbol.toString());
+//            System.out.println(oneGlobalSymbol.toString());
             List<Byte> globalIsConst;
             if (oneGlobalSymbol.isConstant())
                 globalIsConst = int2bytes(1, 1);
@@ -68,7 +68,7 @@ public class OutPutBinary {
         for (Map.Entry<String, Function> stringSymbolEntryEntry : functionTables.entrySet()) {
             var entry = (Map.Entry) stringSymbolEntryEntry;
             Function oneFunction = (Function) entry.getValue();
-            System.out.println(oneFunction.toString());
+//            System.out.println(oneFunction.toString());
             // 函数名
             List<Byte> name = int2bytes(4, oneFunction.getOrder());
             output.addAll(name);
@@ -94,14 +94,14 @@ public class OutPutBinary {
             for (Instruction instruction : instructions) {
                 // type
                 Operation opt = instruction.getOpt();
-                System.out.println(opt.getOptnum());
+//                System.out.println(opt.getOptnum());
                 List<Byte> type = int2bytes(1, opt.getOptnum());
                 output.addAll(type);
 
-                System.out.println(instruction.toString());
+//                System.out.println(instruction.toString());
                 if (instruction.getType() > 0) {
                     List<Byte> x;
-                    System.out.println(instruction.getX());
+//                    System.out.println(instruction.getX());
                     if (instruction.getType() == 1)
                         x = int2bytes(4, (int) instruction.getX());
                     else x = long2bytes(8, (long) instruction.getX());

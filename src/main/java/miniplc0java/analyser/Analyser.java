@@ -880,6 +880,9 @@ public class Analyser {
                     // 当前调用函数
                     curCallFunc = funcTable.get(name);
 
+                    System.out.println();
+                    System.out.println("即将分析函数：" + name);
+
                     if (nextIf(TokenType.R_PAREN) == null) {
                         // 分析传参
                         var expr = analyseExprA();
@@ -905,9 +908,11 @@ public class Analyser {
                 else if (entry.symbolType == SymbolType.ALL)
                     addInstruction(Operation.globa, entry.order);
                 else if (entry.symbolType == SymbolType.PARAM) {
-                    if (curCallFunc != null && curCallFunc.ret_slots == 0)
+                    if (curFunc != null)
+                        System.out.println(curFunc.name + "：" + curFunc.ret_slots);
+                    if (curFunc != null && curFunc.ret_slots == 0) {
                         addInstruction(Operation.arga, entry.order - 1);
-                    else
+                    } else
                         addInstruction(Operation.arga, entry.order);
                 } else if (entry.symbolType == SymbolType.VARIABLE)
                     addInstruction(Operation.loca, entry.order);
