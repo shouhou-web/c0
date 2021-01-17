@@ -12,10 +12,7 @@ import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.util.Pos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 public class Analyser {
     Tokenizer tokenizer;
@@ -41,10 +38,14 @@ public class Analyser {
     Function curFunc;
 
     /**
-     * 当前分析的函数
+     * 是否在while中
      */
     boolean isWhileDomain = false;
 
+    /**
+     * while block
+     */
+    Stack<WhileBlock> whileBlocks = new Stack<>();
 
     public Analyser(Tokenizer tokenizer) throws CompileError {
         init_start();
@@ -598,6 +599,8 @@ public class Analyser {
         Instruction br1 = addInstruction(Operation.brfalse, 0);
         int middle = getInstructionOffset();
 
+        whileBlocks.push(new WhileBlock(start, middle));
+
         // 进入前进入新的域
         newDomain();
         // 块分析
@@ -615,6 +618,7 @@ public class Analyser {
         // 循环while
         br2.setX(start - end);
 
+        whileBlocks.pop();
         isWhileDomain = false;
     }
 
@@ -624,6 +628,8 @@ public class Analyser {
         // todo:【加分】break的代码生成
         if (!isWhileDomain)
             throwError(ErrorCode.NotWhileDomain);
+        addInstruction(Operation.push,0);
+        addInstruction(Operation.br,whileBlocks.peek().getEndOffset(getInstructionOffset()));
         expect(TokenType.BREAK_KW);
         expect(TokenType.SEMICOLON);
     }
@@ -634,6 +640,7 @@ public class Analyser {
         // todo:【加分】continue的代码生成
         if (!isWhileDomain)
             throwError(ErrorCode.NotWhileDomain);
+        addInstruction(Operation.br,whileBlocks.peek().getStartOffset(getInstructionOffset()));
         expect(TokenType.CONTINUE_KW);
         expect(TokenType.SEMICOLON);
     }
@@ -821,7 +828,7 @@ public class Analyser {
                 addInstruction(Operation.ftoi);
             else
                 throwError(ErrorCode.InvalidAs);
-            exprE =  new SymbolEntry(true, typeToken);
+            exprE = new SymbolEntry(true, typeToken);
         }
         return exprE;
     }
