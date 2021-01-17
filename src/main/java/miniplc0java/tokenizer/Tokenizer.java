@@ -81,34 +81,16 @@ public class Tokenizer {
         char ret;
         if (it.peekChar() == '\\') {
             it.nextChar();
-            switch (it.peekChar()) {
-                case '\\':
-                    ret = '\\';
-                    break;
-                case 'r':
-                    ret = '\r';
-                    break;
-                case 'n':
-                    ret = '\n';
-                    break;
-                case 't':
-                    ret = '\t';
-                    break;
-                case '"':
-                    ret = '"';
-                    break;
-                case '\'':
-                    ret = '\'';
-                    break;
-                default:
-                    throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
-            }
+            ret = isEscapeSequence(it.nextChar());
         } else if (it.peekChar() == '\'')
             throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
-        else
+        else {
+
             ret = it.peekChar();
+            it.nextChar();
+        }
         it.nextChar();
-        return new Token(TokenType.STRING_LITEREAL, ret, prePos, it.currentPos());
+        return new Token(TokenType.CHAR_LITEREAL, (int) ret, prePos, it.currentPos());
     }
 
     private char isEscapeSequence(char c) throws TokenizeError {
@@ -327,11 +309,9 @@ public class Tokenizer {
             if (flag == 1 && it.peekChar() == 'n') {
                 it.nextChar();
                 break;
-            }
-            else if (flag == 1) {
+            } else if (flag == 1) {
                 flag = 0;
-            }
-            else if (it.peekChar() == '\\') {
+            } else if (it.peekChar() == '\\') {
                 System.out.println("???");
                 flag = 1;
             }

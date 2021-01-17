@@ -139,12 +139,12 @@ public class Analyser {
     private Token next() throws TokenizeError {
         if (peekedToken != null) {
             var token = peekedToken;
-            // System.out.println("下一个字符" + peekedToken);
+//             System.out.println("下一个字符" + peekedToken);
             peekedToken = null;
             return token;
         } else {
             Token xxx = tokenizer.nextToken();
-            // System.out.println("下一个字符" + xxx);
+//             System.out.println("下一个字符" + xxx);
             return xxx;
         }
     }
@@ -189,6 +189,7 @@ public class Analyser {
         if (token.getTokenType() == tt) {
             return next();
         } else {
+            System.out.println(token);
             throw new ExpectedTokenError(tt, token);
         }
     }
@@ -560,7 +561,6 @@ public class Analyser {
         int middle = getInstructionOffset();
         // 设置跳转至该位置
         br1.setX(middle - start);
-        System.out.println("br1:" + (middle - start));
         if (nextIf(TokenType.ELSE_KW) != null) {
             // ('else' 'if' expr block_stmt)*
             if (check(TokenType.IF_KW))
@@ -580,7 +580,6 @@ public class Analyser {
         // 出来的怎么办？直接跳过所有
         int end = getInstructionOffset();
         br2.setX(end - middle);
-        System.out.println("br2:" + (end - middle));
 
     }
 
@@ -878,10 +877,6 @@ public class Analyser {
                         addInstruction(Operation.stackalloc, 1);
 
                     // 当前调用函数
-                    curCallFunc = funcTable.get(name);
-
-                    System.out.println();
-                    System.out.println("即将分析函数：" + name);
 
                     if (nextIf(TokenType.R_PAREN) == null) {
                         // 分析传参
@@ -893,7 +888,6 @@ public class Analyser {
                     }
                     addInstruction(Operation.callname, this.funcTable.get(name).order);
 
-                    curCallFunc = null;
                     // 函数返回
                     if (func.ret_type == TokenType.VOID_KW)
                         return new SymbolEntry(TokenType.VOID_KW);
@@ -908,8 +902,6 @@ public class Analyser {
                 else if (entry.symbolType == SymbolType.ALL)
                     addInstruction(Operation.globa, entry.order);
                 else if (entry.symbolType == SymbolType.PARAM) {
-                    if (curFunc != null)
-                        System.out.println(curFunc.name + "：" + curFunc.ret_slots);
                     if (curFunc != null && curFunc.ret_slots == 0) {
                         addInstruction(Operation.arga, entry.order - 1);
                     } else

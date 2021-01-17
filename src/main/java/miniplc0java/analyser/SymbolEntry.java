@@ -55,39 +55,6 @@ public class SymbolEntry {
         this.symbolType = SymbolType.TEMPORARY;
     }
 
-    public String toVmCode() {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (isConstant)
-            stringBuilder.append("00000001");
-        else
-            stringBuilder.append("00000000");
-        System.out.println(symbolType);
-        if (symbolType != SymbolType.GLOBAL_STRING)
-            stringBuilder.append("00000000" +
-                    "00000000" +
-                    "00000000" +
-                    "00000000" +
-                    "00000000" +
-                    "00000000" +
-                    "00000000" +
-                    "00000000");
-        else {
-            char[] value = this.value.toCharArray();
-            for (char c : value) {
-                System.out.println(toFullBinaryString(c, 8));
-                stringBuilder.append(toFullBinaryString(c, 8));
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    public static String toFullBinaryString(int num, int size) {
-        char[] chs = new char[size];
-        for (int i = 0; i < size; i++)
-            chs[size - 1 - i] = (char) (((num >> i) & 1) + '0');
-        return new String(chs);
-    }
-
     public SymbolType getSymbolType() {
         return symbolType;
     }
