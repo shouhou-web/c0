@@ -628,8 +628,10 @@ public class Analyser {
         // todo:【加分】break的代码生成
         if (!isWhileDomain)
             throwError(ErrorCode.NotWhileDomain);
-        addInstruction(Operation.push,0);
-        addInstruction(Operation.br,whileBlocks.peek().getEndOffset(getInstructionOffset()));
+        long l = 0;
+        addInstruction(Operation.push, l);
+        Instruction br = addInstruction(Operation.br, 0);
+        br.setX(whileBlocks.peek().getEndOffset(getInstructionOffset()));
         expect(TokenType.BREAK_KW);
         expect(TokenType.SEMICOLON);
     }
@@ -640,7 +642,9 @@ public class Analyser {
         // todo:【加分】continue的代码生成
         if (!isWhileDomain)
             throwError(ErrorCode.NotWhileDomain);
-        addInstruction(Operation.br,whileBlocks.peek().getStartOffset(getInstructionOffset()));
+        Instruction br = addInstruction(Operation.br, 0);
+        br.setX(whileBlocks.peek().getStartOffset(getInstructionOffset()));
+
         expect(TokenType.CONTINUE_KW);
         expect(TokenType.SEMICOLON);
     }
