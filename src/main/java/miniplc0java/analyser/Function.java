@@ -38,8 +38,10 @@ public class Function {
             case INT_KW:
             case DOUBLE_KW:
                 this.ret_slots = 1;
+                break;
             case VOID_KW:
                 this.ret_slots = 0;
+                break;
         }
     }
 

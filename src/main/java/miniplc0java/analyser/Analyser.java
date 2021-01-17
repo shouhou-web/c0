@@ -889,6 +889,8 @@ public class Analyser {
                         expect(TokenType.R_PAREN);
                     }
                     addInstruction(Operation.callname, this.funcTable.get(name).order);
+
+                    curCallFunc = null;
                     // 函数返回
                     if (func.ret_type == TokenType.VOID_KW)
                         return new SymbolEntry(TokenType.VOID_KW);
@@ -906,7 +908,7 @@ public class Analyser {
                     if (curCallFunc != null && curCallFunc.ret_slots == 0)
                         addInstruction(Operation.arga, entry.order - 1);
                     else
-                        addInstruction(Operation.arga, entry.order - 1);
+                        addInstruction(Operation.arga, entry.order);
                 } else if (entry.symbolType == SymbolType.VARIABLE)
                     addInstruction(Operation.loca, entry.order);
                 addInstruction(Operation.load64);
