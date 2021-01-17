@@ -40,6 +40,11 @@ public class Analyser {
      */
     Function curFunc;
 
+    /**
+     * 当前分析的函数
+     */
+    Function curCallFunc;
+
 
     public Analyser(Tokenizer tokenizer) throws CompileError {
         init_start();
@@ -871,6 +876,10 @@ public class Analyser {
                     // 分配空间
                     if (func.ret_type != TokenType.VOID_KW)
                         addInstruction(Operation.stackalloc, 1);
+
+                    // 当前调用函数
+                    curCallFunc = funcTable.get(name);
+
                     if (nextIf(TokenType.R_PAREN) == null) {
                         // 分析传参
                         var expr = analyseExprA();
@@ -893,9 +902,12 @@ public class Analyser {
                     throwError(ErrorCode.ParamNotExist);
                 else if (entry.symbolType == SymbolType.ALL)
                     addInstruction(Operation.globa, entry.order);
-                else if (entry.symbolType == SymbolType.PARAM)
-                    addInstruction(Operation.arga, entry.order);
-                else if (entry.symbolType == SymbolType.VARIABLE)
+                else if (entry.symbolType == SymbolType.PARAM) {
+                    if (curCallFunc != null && curCallFunc.ret_slots == 0)
+                        addInstruction(Operation.arga, entry.order - 1);
+                    else
+                        addInstruction(Operation.arga, entry.order - 1);
+                } else if (entry.symbolType == SymbolType.VARIABLE)
                     addInstruction(Operation.loca, entry.order);
                 addInstruction(Operation.load64);
                 return entry;

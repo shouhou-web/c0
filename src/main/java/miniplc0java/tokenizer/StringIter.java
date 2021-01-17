@@ -45,7 +45,7 @@ public class StringIter {
             System.out.println(next);
             linesBuffer.add(next + '\n');
         }
-        System.out.println("以下為分析");
+        System.out.println("以下为分析");
         // todo:check read \n?
         initialized = true;
     }
