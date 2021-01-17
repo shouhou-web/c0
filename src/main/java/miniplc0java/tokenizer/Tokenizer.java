@@ -238,7 +238,9 @@ public class Tokenizer {
                 // 填入返回语句
                 it.nextChar();
                 return new Token(TokenType.MUL, '*', it.previousPos(), it.currentPos());
-
+            case ':':
+                it.nextChar();
+                return new Token(TokenType.COLON,':', it.previousPos(), it.currentPos());
             case '/':
                 // 填入返回语句
                 it.nextChar();

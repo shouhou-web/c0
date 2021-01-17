@@ -72,7 +72,7 @@ public class Analyser {
         curFunc.incLoc_slots();
 
         if (currentTable.fatherTable == null)
-            return currentTable.putVariable(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.ALL));
+            return currentTable.putVariable(name, new SymbolEntry(isConstant, true, type, SymbolType.ALL));
         else
             return currentTable.putVariable(name, new SymbolEntry(isConstant, isInitialized, type, SymbolType.VARIABLE));
     }
@@ -731,7 +731,7 @@ public class Analyser {
     private SymbolEntry analyseExprC() throws CompileError {
         // C -> D ( {+|-} D )*
         var exprC = analyseExprD();
-        if (check(TokenType.PLUS) || check(TokenType.MINUS)) {
+        while (check(TokenType.PLUS) || check(TokenType.MINUS)) {
             var token = next();
 
             // 检查类型和初始化,并返回相应type的临时变量
@@ -903,7 +903,7 @@ public class Analyser {
         TokenType tt = nameToken.getTokenType();
 
         if (tt == TokenType.Uint_LITERAL || tt == TokenType.CHAR_LITEREAL) {
-            addInstruction(Operation.push, (long) nameToken.getValue());
+            addInstruction(Operation.push, (long) (int) nameToken.getValue());
             return new SymbolEntry(true, TokenType.INT_KW);
         } else if (tt == TokenType.DOUBLE_LITERAL) {
             addInstruction(Operation.push, (Double) nameToken.getValue());
