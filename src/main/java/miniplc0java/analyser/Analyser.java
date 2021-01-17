@@ -910,7 +910,6 @@ public class Analyser {
             return new SymbolEntry(true, TokenType.DOUBLE_KW);
         } else if (tt == TokenType.STRING_LITEREAL) {
             // String
-            System.out.println("233:" + nameToken.getValue().toString());
             SymbolEntry entry = addGlobalString(nameToken.getValue().toString());
             addInstruction(Operation.push, (long) entry.order);
             return new SymbolEntry(true, TokenType.STRING_KW);

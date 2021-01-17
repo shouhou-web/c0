@@ -92,7 +92,6 @@ public class SymbolTable {
         while (find.symbolTable.get(name) == null && find.fatherTable != null) {
             find = find.fatherTable;
         }
-        System.out.println(name);
         if (find.symbolTable.get(name) == null)
             throw new CompileError() {
                 @Override
