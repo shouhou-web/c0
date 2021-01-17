@@ -56,7 +56,7 @@ public class SymbolTable {
             find = find.fatherTable;
         }
         entry.order = find.variableOrder++;
-        find.getSymbolTable().put(entry.getValue(), entry);
+        find.getSymbolTable().put(entry.getValue() + entry.order, entry);
         return entry;
     }
 
@@ -106,19 +106,6 @@ public class SymbolTable {
                 }
             };
         return find.symbolTable.get(name);
-    }
-
-    // 生成代码
-    public String toVmCode() {
-        Iterator iter = symbolTable.entrySet().iterator();
-        StringBuilder stringBuilder = new StringBuilder();
-        while (iter.hasNext()) {
-            this.size += 1;
-            var entry = (Map.Entry) iter.next();
-            SymbolEntry symbolEntry = (SymbolEntry) entry.getValue();
-            stringBuilder.append(symbolEntry.toVmCode());
-        }
-        return stringBuilder.toString();
     }
 
     // 获取大小

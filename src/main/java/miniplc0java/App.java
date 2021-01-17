@@ -58,6 +58,7 @@ public class App {
         Scanner scanner;
         scanner = new Scanner(input);
         var iter = new StringIter(scanner);
+        System.out.println(iter);
         var tokenizer = tokenize(iter);
 
         var analyzer = new Analyser(tokenizer);

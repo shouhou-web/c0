@@ -97,7 +97,7 @@ public class OutPutBinary {
                 System.out.println(opt.getOptnum());
                 List<Byte> type = int2bytes(1, opt.getOptnum());
                 output.addAll(type);
-                // todo:这里有问题
+
                 System.out.println(instruction.toString());
                 if (instruction.getType() > 0) {
                     List<Byte> x;
