@@ -927,6 +927,7 @@ public class Analyser {
                         addInstruction(Operation.arga, entry.order);
                 } else if (entry.symbolType == SymbolType.VARIABLE)
                     addInstruction(Operation.loca, entry.order);
+                System.out.println("?????");
                 addInstruction(Operation.load64);
                 return entry;
             }

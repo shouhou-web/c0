@@ -80,16 +80,6 @@ public class App {
         return parser;
     }
 
-    private static ArrayList<Byte> handleInt(int num) {
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(0, num);
-        ArrayList<Byte> res = new ArrayList<>();
-        for (byte b : buffer.array()) {
-            res.add(b);
-        }
-        return res;
-    }
-
     private static Tokenizer tokenize(StringIter iter) {
         var tokenizer = new Tokenizer(iter);
         return tokenizer;
